@@ -1,0 +1,1 @@
+# plugins-multibanco-ifthen-software-gateway-for-woocommerce
