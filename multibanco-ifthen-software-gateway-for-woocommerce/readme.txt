@@ -2,9 +2,9 @@
 Contributors: webdados, ptwooplugins, ifthenpay
 Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.6
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 9.5.0
+Stable tag: 9.6.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -233,6 +233,10 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 9.6.0 - 2024-10-08 =
+* [FIX] Load text domain at the right time to avoid PHP notices on WordPress 6.7 and above
+* [DEV] Tested with WordPress 6.7-beta1-59184 and WooCommerce 9.4.0-beta.2
 
 = 9.5.0 - 2024-09-19 =
 * [FIX] Get the Multibanco reference earlier on the blocks checkout so that we can throw the error before hitting the thank you page

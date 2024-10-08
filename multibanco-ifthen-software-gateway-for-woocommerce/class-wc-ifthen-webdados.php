@@ -119,12 +119,14 @@ final class WC_IfthenPay_Webdados {
 		$this->pro_add_on_active = function_exists( 'WC_IfthenPay_Pro' );
 		$this->wpml_active       = function_exists( 'icl_object_id' ) && function_exists( 'icl_register_string' );
 		if ( $this->wpml_active ) {
-			$this->wpml_translation_info = sprintf(
-				/* translators: %1$s: link opening tag, %2$s: link closing tag */
-				__( 'You should translate this string in %1$sWPML - String Translation%2$s after saving the settings', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-				'<a href="admin.php?page=wpml-string-translation%2Fmenu%2Fstring-translation.php">',
-				'</a>'
-			);
+			add_action( 'init', function() { // Since WordPress 6.7 avoid textdomain warnings
+				$this->wpml_translation_info = sprintf(
+					/* translators: %1$s: link opening tag, %2$s: link closing tag */
+					__( 'You should translate this string in %1$sWPML - String Translation%2$s after saving the settings', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+					'<a href="admin.php?page=wpml-string-translation%2Fmenu%2Fstring-translation.php">',
+					'</a>'
+				);
+			} );
 		}
 		$this->wc_deposits_active      = function_exists( 'wc_deposits_woocommerce_is_active' ) || function_exists( '\Webtomizer\WCDP\wc_deposits_woocommerce_is_active' );
 		$this->wc_subscriptions_active = function_exists( 'wcs_get_subscription' );
@@ -1863,15 +1865,15 @@ final class WC_IfthenPay_Webdados {
 											__( 'The %s payment details have changed', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 											'Multibanco'
 										) . ':
-– – – – – – – – – – – – – – – – – - - - -
+- - - - - - - - - - - - - - - - - - - - -
 ' . __( 'Previous entity', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
 ' . __( 'Previous reference', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
 ' . __( 'Previous value', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
-– – – – – – – – – – – – – – – – – - - - -
+- - - - - - - - - - - - - - - - - - - - -
 ' . __( 'New entity', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
 ' . __( 'New reference', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
 ' . __( 'New value', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': %s
-– – – – – – – – – – – – – – – – – - - - -
+- - - - - - - - - - - - - - - - - - - - -
 ' . sprintf( __( 'If the customer pays using the previous details, the payment will be accepted by the %s system, but the order will not be updated via callback.', 'multibanco-ifthen-software-gateway-for-woocommerce' ), 'Multibanco' ),
 										isset( $order_mb_details['ent'] ) ? trim( $order_mb_details['ent'] ) : '',
 										isset( $order_mb_details['ref'] ) ? $this->format_multibanco_ref( $order_mb_details['ref'] ) : '',
