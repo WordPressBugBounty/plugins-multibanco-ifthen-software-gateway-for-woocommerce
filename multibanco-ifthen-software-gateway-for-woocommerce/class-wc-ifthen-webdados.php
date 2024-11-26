@@ -68,8 +68,8 @@ final class WC_IfthenPay_Webdados {
 	/* Internal variables - For MB WAY */
 	public $mbway_settings               = null;
 	public $mbway_notify_url             = '';
-	public $mbway_minutes                = 5;
-	public $mbway_multiplier_new_payment = 1.2;
+	public $mbway_minutes                = 4;
+	public $mbway_multiplier_new_payment = 1.3;
 	public $mbway_min_value              = 0;
 	public $mbway_max_value              = 99999.99;
 	public $mbway_banner_email           = '';
@@ -212,7 +212,7 @@ final class WC_IfthenPay_Webdados {
 		add_action( 'add_meta_boxes', array( $this, 'multibanco_order_metabox' ) );
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'shop_order_search' ) );
 		add_filter( 'woocommerce_order_table_search_query_meta_keys', array( $this, 'shop_order_search' ) );
-		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'multibanco_woocommerce_checkout_update_order_meta' ) );    // Frontend
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'multibanco_woocommerce_checkout_update_order_meta' ) ); // Frontend
 		add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', array( $this, 'multibanco_woocommerce_order_data_store_cpt_get_orders_query' ), 10, 3 );
 		add_action( 'woocommerce_cancel_unpaid_orders', array( $this, 'multibanco_woocommerce_cancel_unpaid_orders' ), 99 );
 		add_filter( 'apg_sms_message', array( $this, 'multibanco_apg_sms_message' ), 10, 2 );
@@ -1360,7 +1360,7 @@ final class WC_IfthenPay_Webdados {
 								$desc        = trim( get_bloginfo( 'name' ) );
 								$args        = array(
 									'method'   => 'POST',
-									'timeout'  => apply_filters( 'multibanco_ifthen_webservice_timeout', 30 ),
+									'timeout'  => apply_filters( 'multibanco_ifthen_webservice_timeout', 15 ),
 									'blocking' => true,
 									'headers'  => array( 'Content-Type' => 'application/json; charset=utf-8' ),
 									'body'     => array(
@@ -1702,7 +1702,7 @@ final class WC_IfthenPay_Webdados {
 		$desc             .= ' #' . $order->get_order_number();
 		$args              = array(
 			'method'   => 'POST',
-			'timeout'  => apply_filters( 'mbway_ifthen_webservice_timeout', 30 ),
+			'timeout'  => apply_filters( 'mbway_ifthen_webservice_timeout', 15 ),
 			'blocking' => true,
 			'body'     => array(
 				'MbWayKey'   => $mbwaykey,
@@ -1781,11 +1781,15 @@ final class WC_IfthenPay_Webdados {
 	public function multibanco_woocommerce_checkout_update_order_meta( $order_id ) {
 		$order = wc_get_order( $order_id );
 		// Avoid duplicate instructions on the email...
-		if ( $order->get_payment_method() === $this->multibanco_id ) {
-			$this->debug_log_extra( $this->multibanco_id, 'multibanco_woocommerce_checkout_update_order_meta - Force ref generation before anything - Order ' . $order->get_id() );
-			$ref = $this->multibanco_get_ref( $order->get_id(), false, true );
-			// That should do it...
-			$this->debug_log_extra( $this->multibanco_id, 'multibanco_woocommerce_checkout_update_order_meta - Ref: ' . wp_json_encode( $ref ) . ' - Order ' . $order->get_id() );
+		if ( $order ) {
+			if ( $order->get_payment_method() === $this->multibanco_id ) {
+				$this->debug_log_extra( $this->multibanco_id, 'multibanco_woocommerce_checkout_update_order_meta - Force ref generation before anything - Order ' . $order->get_id() );
+				$ref = $this->multibanco_get_ref( $order->get_id(), false, true );
+				// That should do it...
+				$this->debug_log_extra( $this->multibanco_id, 'multibanco_woocommerce_checkout_update_order_meta - Ref: ' . wp_json_encode( $ref ) . ' - Order ' . $order->get_id() );
+			}
+		} else {
+			$this->debug_log_extra( $this->multibanco_id, 'multibanco_woocommerce_checkout_update_order_meta - Could not get order - Order ' . $order_id );
 		}
 	}
 
@@ -2709,7 +2713,7 @@ final class WC_IfthenPay_Webdados {
 		);
 		$args     = array(
 			'method'   => 'POST',
-			'timeout'  => apply_filters( 'ifthen_callback_webservice_timeout', 30 ),
+			'timeout'  => apply_filters( 'ifthen_callback_webservice_timeout', 15 ),
 			'blocking' => true,
 			'headers'  => array(
 				'content-type' => 'application/json',
@@ -2780,7 +2784,7 @@ final class WC_IfthenPay_Webdados {
 		}
 		$args         = array(
 			'method'   => 'POST',
-			'timeout'  => apply_filters( 'mbway_ifthen_webservice_timeout', 30 ), // Should use the method own filter, but this will do...
+			'timeout'  => apply_filters( 'mbway_ifthen_webservice_timeout', 15 ),
 			'blocking' => true,
 			'headers'  => array( 'Content-Type' => 'application/json; charset=utf-8' ),
 			'body'     => array(
@@ -2805,7 +2809,11 @@ final class WC_IfthenPay_Webdados {
 						$debug_msg       = '- Error from IfthenPay: ' . trim( $body->Message ) . ' - Order ' . $order->get_id();
 						$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
 						$this->debug_log( $method_id, $debug_msg, 'error', true, $debug_msg_email );
-						return new WP_Error( 'error', $debug_msg . ' - ' . __( 'Do not contact the plugin support. You need to check with IfthenPay why this refund could not be issued.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+						//return new WP_Error( 'error', $debug_msg . ' - ' . __( 'Do not contact the plugin support. You need to check with IfthenPay why this refund could not be issued.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+						return new WP_Error(
+							'error',
+							__( 'We are sorry, but it was not possible to issue the refund. Please contact the IfthenPay support.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' - (' . trim( $body->Code ) . ')' 
+						);
 					}
 				} else {
 					$debug_msg       = '- Response body is not JSON - Order ' . $order->get_id();
