@@ -226,7 +226,9 @@ final class WC_IfthenPay_Webdados {
 		add_action( 'after_setup_theme', array( $this, 'set_images' ) );
 		// Order status listener/Ajax hook
 		add_action( 'wp_ajax_wc_mbway_ifthen_order_status', array( $this, 'mbway_ajax_order_status' ) );
+		add_action( 'wp_ajax_nopriv_wc_mbway_ifthen_order_status', array( $this, 'mbway_ajax_order_status' ) );
 		add_action( 'wp_ajax_wc_cofidispay_ifthenpay_order_status', array( $this, 'cofidispay_ajax_order_status' ) );
+		add_action( 'wp_ajax_nopriv_wc_cofidispay_ifthenpay_order_status', array( $this, 'cofidispay_ajax_order_status' ) );
 		// Request MB WAY payment again
 		add_action( 'wp_ajax_mbway_ifthen_request_payment_again', array( $this, 'wp_ajax_mbway_ifthen_request_payment_again' ) );
 		// Order value changed?

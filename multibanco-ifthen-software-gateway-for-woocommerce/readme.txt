@@ -4,7 +4,7 @@ Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 9.7
+Stable tag: 9.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -54,7 +54,7 @@ Get the [PRO add-on](https://ptwooplugins.com/product/multibanco-mbway-credit-ca
 
 * Recover unpaid MB WAY orders by converting them to Multibanco and notify the customer via email;
 * Automatic cancellation of orders when Multibanco, Payshop or MB WAY references expire;
-* Countdown timer on the “thank you” page for MB WAY payments;
+* Countdown timer on the “Thank you” page for MB WAY payments;
 * Save the MB WAY mobile number to the user profile for future purchases;
 * Trigger Multibanco and MB WAY payments when creating orders via the REST API;
 * Store and show IfthenPay fee on each order;
@@ -234,6 +234,10 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 
 == Changelog ==
 
+= 9.7.1 - 2024-11-29 =
+* [FIX] Fix MB WAY and Cofidis order status check on the “Thank you” for non-logged in customers
+* [Black Friday & Cyber Monday] Get our [PRO add-on](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) with 25% discount until December 2
+
 = 9.7 - 2024-11-26 =
 * [TWEAK] Change MB WAY timeout from 5 to 4 minutes (which is the true interval set by SIBS)
 * [TWEAK] Better "refund not issued" message
@@ -247,7 +251,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * [DEV] Tested with WordPress 6.7-beta1-59184 and WooCommerce 9.4.0-beta.2
 
 = 9.5.0 - 2024-09-19 =
-* [FIX] Get the Multibanco reference earlier on the blocks checkout so that we can throw the error before hitting the thank you page
+* [FIX] Get the Multibanco reference earlier on the blocks checkout so that we can throw the error before hitting the “Thank you” page
 * [TWEAK] Try to get MB WAY phone number from `$_REQUEST` if not found in `$_POST` for edge scenarios
 * [TWEAK] Refactor code to set initial order status, order note and payment request errors
 * [TWEAK] Update readme.txt FAQ information about 404 callback error because of specific permalink settings
@@ -350,7 +354,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Tested with WordPress 6.5-alpha-57150 and WooCommerce 8.4.0-beta.1
 
 = 8.8.0 - 2023-11-15 =
-* [PRO add-on 1.6](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Countdown timer on the thank you page for MB WAY payments
+* [PRO add-on 1.6](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Countdown timer on the “Thank you” page for MB WAY payments
 * Tested with WordPress 6.5-alpha-57110, WooCommerce 8.3.0-rc.2 and WooCommerce Blocks 11.5.4
 
 = 8.7.0 - 2023-10-30 =
@@ -584,7 +588,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Bugfix checking if order is paid when the "WooCommerce Order Status Manager" (by SkyVerge) plugin is active
 
 = 4.4.0 =
-* New `ifthen_unpaid_statuses` filter to allow developers to set additional valid "unpaid" statuses for Multibanco, MB WAY and Payshop orders, besides the default ones ("on-hold", "pending" and "partially-paid"). The statuses are used for callback validation, SMS message template, show order as unpaid on the backoffice, show "Pay" button on My Account orders list, issue new references if order value changes on the backoffice, reduce order stock rules, thank you page and email payment instructions.
+* New `ifthen_unpaid_statuses` filter to allow developers to set additional valid "unpaid" statuses for Multibanco, MB WAY and Payshop orders, besides the default ones ("on-hold", "pending" and "partially-paid"). The statuses are used for callback validation, SMS message template, show order as unpaid on the backoffice, show "Pay" button on My Account orders list, issue new references if order value changes on the backoffice, reduce order stock rules, “Thank you” page and email payment instructions.
 * Enforce requirement of WooCommerce 2.6.0 or above and bumped the `WC requires at least` tag accordingly
 * Enforce requirement of WordPress 4.4 or above and bumped the `Requires at least` tag accordingly
 * New filter `ifthen_debug_log_extra` that will allow developers to further debug the Multibanco reference generation (for now)
@@ -682,7 +686,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 = 4.0.3 =
 * Deactivate the payment methods if the required settings are not filled in
 * Fix bug when showing the MB WAY expiration date on the order admin page
-* Fix bug on the Payshop intructions on the thank you page when the reference has no expiration date
+* Fix bug on the Payshop intructions on the “Thank you” page when the reference has no expiration date
 * Correctly disable payment gateways if value is not on the allowed interval when payment inside the My account page
 * readme.txt adjustments
 
