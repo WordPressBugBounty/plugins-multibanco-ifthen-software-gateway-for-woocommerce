@@ -1,5 +1,5 @@
 /**
- * The Cofidis Pay frontend javascript
+ * The ifthenpay Gateway frontend javascript
  */
 
 jQuery(
@@ -7,28 +7,28 @@ jQuery(
 
 		var order_id;
 		var order_key;
-		var interval          = cofidispay_ifthenpay.interval * 1000;
-		var cofidispay_expire = ( parseInt( cofidispay_ifthenpay.cofidispay_minutes ) + 1 ) * 60 * 1000;
-		var total_interval    = 0;
+		var interval       = gateway_ifthenpay.interval * 1000;
+		var gateway_expire = ( parseInt( gateway_ifthenpay.gateway_minutes ) + 1 ) * 60 * 1000;
+		var total_interval = 0;
 
-		function cofidispay_ifthenpay_order_check_status_init() {
-			order_id  = $( '#cofidispay-order-id' ).val();
-			order_key = $( '#cofidispay-order-key' ).val();
+		function gateway_ifthen_order_check_status_init() {
+			order_id  = $( '#gatewayifthenpay-order-id' ).val();
+			order_key = $( '#gatewayifthenpay-order-key' ).val();
 			setTimeout(
 				function () {
-					cofidispay_ifthenpay_order_check_status();
+					gateway_ifthen_order_check_status();
 				},
 				interval
 			);
 		}
 
-		function cofidispay_ifthenpay_order_check_status() {
+		function gateway_ifthen_order_check_status() {
 			total_interval = total_interval + interval;
 			page_url       = new URL( window.location.href );
 			page_url.searchParams.set( 'cache_buster', Math.random() );
-			console.log( 'Checking Cofidis Pay payment status, after ' + interval + 'ms (total: ' + total_interval + 'ms)' );
+			console.log( 'Checking Gateway ifthenpay payment status, after ' + interval + 'ms (total: ' + total_interval + 'ms)' );
 			var data = {
-				action: 'wc_cofidispay_ifthenpay_order_status',
+				action: 'wc_gateway_ifthenpay_order_status',
 				order_id: order_id,
 				order_key: order_key
 			};
@@ -43,23 +43,23 @@ jQuery(
 						window.location.href = page_url.toString() + '#ifthenpay_payment_received';
 					} else {
 						interval = Math.round( interval * 1.2 );
-						if ( total_interval <= cofidispay_expire ) {
+						if ( total_interval <= gateway_expire ) {
 							setTimeout(
 								function () {
-									cofidispay_ifthenpay_order_check_status();
+									gateway_ifthen_order_check_status();
 								},
 								interval
 							);
 						} else {
-							console.log( 'Stopped checking Cofidis Pay payment status, after ' + total_interval + 'ms' );
+							console.log( 'Stopped checking MB WAY payment status, after ' + total_interval + 'ms' );
 						}
 					}
 				}
 			);
 		}
 
-		if ( $( '.cofidispay_ifthen_for_woocommerce_table' ).length ) {
-			cofidispay_ifthenpay_order_check_status_init();
+		if ( $( '.gateway_ifthen_ifthen_for_woocommerce_table' ).length ) {
+			gateway_ifthen_order_check_status_init();
 		}
 
 	}

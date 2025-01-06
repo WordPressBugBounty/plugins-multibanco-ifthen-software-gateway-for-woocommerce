@@ -10,7 +10,7 @@ import { applyFilters } from '@wordpress/hooks';
 
 const settings = getSetting( 'mbway_ifthen_for_woocommerce_data', {} );
 const defaultLabel = __(
-	'MB WAY (IfthenPay)',
+	'MB WAY (ifthenpay)',
 	'multibanco-ifthen-software-gateway-for-woocommerce'
 );
 const label = decodeEntities( settings.title ) || defaultLabel;
@@ -32,7 +32,7 @@ const Content = ( props ) => {
 			// Here we can do any processing we need, and then emit a response.
 			// For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
 			const mbway_ifthen_for_woocommerce_phone = mbwayPhoneNumber; // This will need to be the value of the input field
-			const customDataIsValid = ( mbway_ifthen_for_woocommerce_phone.length == 9 );
+			const customDataIsValid = ( mbway_ifthen_for_woocommerce_phone.length === 9 );
 
 			if ( customDataIsValid ) {
 				return {
@@ -105,7 +105,7 @@ const Content = ( props ) => {
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-	var icon = React.createElement( 'img', { src: settings.icon, width: 28, height: 24, style: { display: 'inline' } } );
+	var icon = React.createElement( 'img', { src: settings.icon, width: settings.icon_width, height: settings.icon_height, style: { display: 'inline' } } );
 	var span = React.createElement( 'span', { className: 'wc-block-components-payment-method-label wc-block-components-payment-method-label--with-icon' }, icon, decodeEntities( settings.title ) || defaultLabel );
 	return span;
 };

@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 
 const settings = getSetting( 'cofidispay_ifthen_for_woocommerce_data', {} );
 const defaultLabel = __(
-	'Cofidis Pay (IfthenPay)',
+	'Cofidis Pay (ifthenpay)',
 	'multibanco-ifthen-software-gateway-for-woocommerce'
 );
 const label = decodeEntities( settings.title ) || defaultLabel;
@@ -68,7 +68,7 @@ const Content = ( props ) => {
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-	var icon = React.createElement( 'img', { src: settings.icon, width: 28, height: 24, style: { display: 'inline' } } );
+	var icon = React.createElement( 'img', { src: settings.icon, width: settings.icon_width, height: settings.icon_height, style: { display: 'inline' } } );
 	var span = React.createElement( 'span', { className: 'wc-block-components-payment-method-label wc-block-components-payment-method-label--with-icon' }, icon, decodeEntities( settings.title ) || defaultLabel );
 	return span;
 };
@@ -116,7 +116,7 @@ const CanMakePayment = ( checkoutData ) => {
 /**
  * Payshop payment method config object.
  */
-const ifthenpayCCPaymentMethod = {
+const ifthenpayCofidisPaymentMethod = {
 	name: 'cofidispay_ifthen_for_woocommerce',
 	label: React.createElement( Label, null ),
 	content: React.createElement( Content, null ),
@@ -129,4 +129,4 @@ const ifthenpayCCPaymentMethod = {
 	},
 };
 
-registerPaymentMethod( ifthenpayCCPaymentMethod );
+registerPaymentMethod( ifthenpayCofidisPaymentMethod );
