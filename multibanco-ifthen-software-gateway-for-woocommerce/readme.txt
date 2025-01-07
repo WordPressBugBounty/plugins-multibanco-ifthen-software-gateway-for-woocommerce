@@ -4,7 +4,7 @@ Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 10.0.0
+Stable tag: 10.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -255,7 +255,10 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 
 == Changelog ==
 
-= 10.0.0 - 2024-01-06 =
+= 10.0.1 - 2025-01-07 =
+* [FIX] New payment method admin notices not showing properly
+
+= 10.0.0 - 2025-01-06 =
 * [NEW] Apple Pay, Google Pay, and PIX payment methods (via ifthenpay Gateway)
 * [NEW] Plugin name: Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce
 * [NEW] Credit card callback as a fallback in case something fails when the customer returns from the gateway

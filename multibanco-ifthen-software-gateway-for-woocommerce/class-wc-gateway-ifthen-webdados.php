@@ -264,7 +264,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 					'title'             => __( 'Backoffice key', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 					'type'              => 'text',
 					'default'           => '',
-					'description'       => __( 'The ifthenpay backoffice key you got after signing the contract', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ( apply_filters( 'gateway_ifthen_sandbox', false ) ? '<br><span style="color: red;">Sandbox</span>' : '' ),
+					'description'       => __( 'The ifthenpay backoffice key you got after signing the contract.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ( apply_filters( 'gateway_ifthen_sandbox', false ) ? '<br><span style="color: red;">Sandbox</span>' : '' ),
 					'placeholder'       => '0000-0000-0000-0000',
 					'custom_attributes' => array(
 						'maxlength' => 19,
@@ -1641,11 +1641,11 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 			) {
 				?>
 				<div id="gateway_ifthen_newmethod_notice" class="notice notice-info is-dismissible" style="padding-right: 38px; position: relative; display: none;">
-					<img src="<?php echo esc_url( WC_IfthenPay_Webdados()->gateway_ifthen_banner ); ?>" style="float: left; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 1em; max-height: 48px; max-width: 186px;"/>
+					<img src="<?php echo esc_url( WC_IfthenPay_Webdados()->gateway_ifthen_banner ); ?>" style="float: left; margin-top: 1.25em; margin-bottom: 0.5em; margin-right: 1em; max-height: 24px; max-width: 93px;"/>
 					<p>
 						<?php
 							echo wp_kses_post(
-								printf(
+								sprintf(
 									/* translators: %s: payment method */
 									__( 'There’s a new payment method available: %s.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 									'<strong>' . __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' (Apple Pay, Google Pay, PIX)</strong>'
@@ -1670,7 +1670,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				</div>
 				<script type="text/javascript">
 				(function () {
-					notice    = jQuery( '#gateway_ifthen_ifthen_newmethod_notice');
+					notice    = jQuery( '#gateway_ifthen_newmethod_notice');
 					dismissed = localStorage.getItem( '<?php echo esc_attr( $this->id ); ?>_newmethod_notice_dismiss' );
 					if ( !dismissed ) {
 						jQuery( notice ).show();

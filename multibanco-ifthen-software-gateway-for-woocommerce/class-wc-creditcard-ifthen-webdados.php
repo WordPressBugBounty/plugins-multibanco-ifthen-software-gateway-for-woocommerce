@@ -1393,7 +1393,7 @@ Email enviado automaticamente do plugin WordPress “ifthenpay for WooCommerce�
 					<p>
 						<?php
 							echo wp_kses_post(
-								printf(
+								sprintf(
 									/* translators: %s: payment method */
 									__( 'There’s a new payment method available: %s.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 									'<strong>Credit or debit card (ifthenpay)</strong>'
