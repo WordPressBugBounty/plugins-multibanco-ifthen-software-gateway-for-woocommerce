@@ -4,7 +4,7 @@ Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 10.0.2
+Stable tag: 10.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,11 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 10.1.0 - 2025-01-15 =
+* [FIX] Callback calls failing for values under 1.00 Euro
+* [FIX] Set Payshop expiration at the end of the day
+* [DEV] Tested with WordPress 6.8-alpha-59604 and WooCommerce 9.6.0-rc.1
 
 = 10.0.2 - 2025-01-13 =
 * [FIX] PHP notice on the `multibanco_ifthen_thankyou_instructions_table_html` filter
