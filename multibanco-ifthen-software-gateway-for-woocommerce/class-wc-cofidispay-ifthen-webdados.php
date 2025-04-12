@@ -70,8 +70,8 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			}
 
 			// Webservice
-			$this->api_url        = 'https://ifthenpay.com/api/cofidis/init/'; // production and test mode, depends on Cofidis Pay Key
-			$this->limits_api_url = 'https://ifthenpay.com/api/cofidis/limits/';
+			$this->api_url        = 'https://api.ifthenpay.com/cofidis/init/'; // production and test mode, depends on Cofidis Pay Key
+			$this->limits_api_url = 'https://api.ifthenpay.com/cofidis/limits/';
 
 			// Plugin options and settings
 			$this->init_form_fields();
@@ -339,7 +339,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				$pro_fake_fields[ $key ]['description'] .= sprintf(
 					/* translators: %1$s: link open, %2$s: link close */
 					__( 'Available on the %1$sPRO Add-on%2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-					'<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
+					'<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
 					'</a>'
 				);
 			}

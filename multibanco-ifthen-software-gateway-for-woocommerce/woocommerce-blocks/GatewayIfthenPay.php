@@ -84,7 +84,7 @@ final class GatewayIfthenPay extends AbstractPaymentMethodType {
 				'only_portugal' => $this->settings['only_portugal'] === 'yes',
 				'only_above'    => floatval( $this->settings['only_above'] ) > 0 ? floatval( $this->settings['only_above'] ) : null,
 				'only_bellow'   => floatval( $this->settings['only_bellow'] ) > 0 ? floatval( $this->settings['only_bellow'] ) : null,
-				// We do not declare subscriptions support on Apple, Google, Pix, ...
+				// We do not declare subscriptions support on Apple, Google, PIX, ...
 				// 'support_woocommerce_subscriptions' => isset( $this->settings['support_woocommerce_subscriptions'] ) && ( 'yes' === $this->settings['support_woocommerce_subscriptions'] ), // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 				// More settings needed?
 			)

@@ -1,10 +1,10 @@
 === Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce ===
-Contributors: webdados, ptwooplugins, ifthenpay
+Contributors: nakedcatplugins, webdados, ifthenpay
 Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 10.2.1
+Stable tag: 10.3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,7 +21,7 @@ Credit or debit cards, including Apple Pay and Google Pay, CTT Payshop, and Cofi
 
 Holders of a Brazilian bank account can conveniently pay for WooCommerce orders in Euros, with automatic currency conversion to Brazilian Real, using PIX.
 
-This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract with this company is required. Technical support is provided by [PT Woo Plugins](https://ptwooplugins.com) (by [Webdados](https://www.webdados.pt)) on the [WordPress.org support forums](https://wordpress.org/support/plugin/multibanco-ifthen-software-gateway-for-woocommerce/).
+This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract with this company is required. Technical support is provided by [Naked Cat Plugins](https://nakedcatplugins.com) (by [Webdados](https://www.webdados.pt)) on the [WordPress.org support forums](https://wordpress.org/support/plugin/multibanco-ifthen-software-gateway-for-woocommerce/).
 
 **Fully compatible with the new [High-Performance Order Storage](https://woocommerce.com/posts/platform-update-high-performance-order-storage-for-woocommerce/) and [WooCommerce Checkout Blocks](https://woocommerce.com/checkout-blocks/).**
 
@@ -55,7 +55,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 
 = PRO add-on =
 
-Get the [PRO add-on](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) and unlock extra features:
+Get the [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) and unlock extra features:
 
 * Recover unpaid MB WAY orders by converting them to Multibanco and notify the customer via email;
 * Automatic cancellation of orders when Multibanco, Payshop, or MB WAY references expire;
@@ -82,21 +82,21 @@ Get the [PRO add-on](https://ptwooplugins.com/product/multibanco-mbway-credit-ca
 	* Automatic updates;
 	* Good karma;
 
-The PRO add-on is a product of [PT Woo Plugins](https://ptwooplugins.com) (by [Webdados](https://www.webdados.pt)), and is not provided by ifthenpay.
+The PRO add-on is a product of [Naked Cat Plugins](https://nakedcatplugins.com) (by [Webdados](https://www.webdados.pt)), and is not provided by ifthenpay.
 
 = Other (premium) plugins =
 
 Already know our other WooCommerce (premium) plugins?
 
-* [Portuguese Postcodes for WooCommerce](https://ptwooplugins.com/product/portuguese-postcodes-for-woocommerce-technical-support/) - Automatic filling of the address details at the checkout, including street name and neighbourhood, based on the postal code
+* [Portuguese Postcodes for WooCommerce](https://nakedcatplugins.com/product/portuguese-postcodes-for-woocommerce-technical-support/) - Automatic filling of the address details at the checkout, including street name and neighbourhood, based on the postal code
 * [Invoicing with InvoiceXpress for WooCommerce](https://invoicewoo.com/) - Automatically issue invoices directly from the WooCommerce order
-* [DPD Portugal for WooCommerce](https://ptwooplugins.com/product/dpd-portugal-for-woocommerce/) - Create shipping and return guide in the DPD API directly from the WooCommerce order
-* [Feed KuantoKusta for WooCommerce](https://ptwooplugins.com/product/feed-kuantokusta-for-woocommerce-pro/) - Publish your products on Kuanto Kusta with this easy to use feed generator
-* [Simple Checkout Fields Manager for WooCommerce](https://ptwooplugins.com/product/simple-custom-fields-for-woocommerce-blocks-checkout/) - Add custom fields and manage (remove, make required or optional) core fields on the new WooCommerce Block-based Checkout
-* [Simple WooCommerce Order Approval](https://ptwooplugins.com/product/simple-woocommerce-order-approval/) - The hassle-free solution for WooCommerce order approval before payment
-* [Shop as Client for WooCommerce](https://ptwooplugins.com/product/shop-as-client-for-woocommerce-pro-add-on/) - Quickly create orders on behalf of your customers
-* [Taxonomy/Term and Role based Discounts for WooCommerce](https://ptwooplugins.com/product/taxonomy-term-and-role-based-discounts-for-woocommerce-pro-add-on/) - Easily create bulk discount rules for products based on any taxonomy terms (built-in or custom)
-* [DPD / SEUR / Geopost Pickup and Lockers network for WooCommerce](https://ptwooplugins.com/product/dpd-seur-geopost-pickup-and-lockers-network-for-woocommerce/) - Deliver your WooCommerce orders on the DPD and SEUR Pickup network of Parcelshops and Lockers in 21 European countries
+* [DPD Portugal for WooCommerce](https://nakedcatplugins.com/product/dpd-portugal-for-woocommerce/) - Create shipping and return guide in the DPD API directly from the WooCommerce order
+* [Feed KuantoKusta for WooCommerce](https://nakedcatplugins.com/product/feed-kuantokusta-for-woocommerce-pro/) - Publish your products on Kuanto Kusta with this easy to use feed generator
+* [Simple Checkout Fields Manager for WooCommerce](https://nakedcatplugins.com/product/simple-custom-fields-for-woocommerce-blocks-checkout/) - Add custom fields and manage (remove, make required or optional) core fields on the new WooCommerce Block-based Checkout
+* [Simple WooCommerce Order Approval](https://nakedcatplugins.com/product/simple-woocommerce-order-approval/) - The hassle-free solution for WooCommerce order approval before payment
+* [Shop as Client for WooCommerce](https://nakedcatplugins.com/product/shop-as-client-for-woocommerce-pro-add-on/) - Quickly create orders on behalf of your customers
+* [Taxonomy/Term and Role based Discounts for WooCommerce](https://nakedcatplugins.com/product/taxonomy-term-and-role-based-discounts-for-woocommerce-pro-add-on/) - Easily create bulk discount rules for products based on any taxonomy terms (built-in or custom)
+* [DPD / SEUR / Geopost Pickup and Lockers network for WooCommerce](https://nakedcatplugins.com/product/dpd-seur-geopost-pickup-and-lockers-network-for-woocommerce/) - Deliver your WooCommerce orders on the DPD and SEUR Pickup network of Parcelshops and Lockers in 21 European countries
 
 == Installation ==
 
@@ -255,6 +255,14 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 
 == Changelog ==
 
+= 10.3.0 - 2025-04-12 =
+* [NEW] We are now called Naked Cat Plugins 😻
+* [DEV] Update Multibanco API URL
+* [DEV] Update Cofidis API URL
+* [DEV] New `mbway_ifthen_after_process_payment` hook (action)
+* [TWEAK] [PRO add-on 5.1](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Only save MBWAY number to user profile if the request payment API call to ifthenpay is successfully
+* [DEV] Tested with WordPress 6.8-RC3-60146 and WooCommerce 9.8.1
+
 = 10.2.1 - 2025-03-17 =
 * [DEV] Stop trying to fix the email locale with WPML active because it was causing the language to be incorrect (can be reactivated by returning `true` to `multibanco_ifthen_maybe_change_email_locale` filter)
 * [TWEAK] Reuse several i18n strings on all the payment methods with placeholders
@@ -311,11 +319,11 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * [DEV] Tested with WordPress 6.7-alpha-59064 and WooCommerce 9.3.2
 
 = 9.4.4 - 2024-07-16 =
-* [TWEAK] Implement hook on the MB WAY payment gateway needed by [PRO add-on 4.1](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)
+* [TWEAK] Implement hook on the MB WAY payment gateway needed by [PRO add-on 4.1](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)
 * [DEV] Tested with WordPress 6.7-alpha-58848 and WooCommerce 9.2.0-beta.1
 
 = 9.4.3 - 2024-07-16 =
-* [TWEAK] Implement hook on the MB WAY settings screen needed by the [PRO add-on 4.0](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)
+* [TWEAK] Implement hook on the MB WAY settings screen needed by the [PRO add-on 4.0](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)
 * [DEV] Tested with WordPress 6.6-RC4-58723 and WooCommerce 9.1.2
 
 = 9.4.2 - 2024-06-27 =
@@ -341,10 +349,10 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * [DEV] Tested with WordPress 6.6-alpha-58182 and WooCommerce 8.9.1
 
 = 9.2.4 - 2024-04-09 =
-* [TWEAK] Show [PRO add-on 3.5](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) blurred options 
+* [TWEAK] Show [PRO add-on 3.5](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) blurred options 
 
 = 9.2.3 - 2024-04-08 =
-* [NEW] [PRO add-on 3.5](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Codifis payment information banner, with the price to pay month, on the product page (simple product for now)
+* [NEW] [PRO add-on 3.5](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Codifis payment information banner, with the price to pay month, on the product page (simple product for now)
 * [DEV] Tested with WordPress 6.6-alpha-57928 and WooCommerce 8.8.0-rc.1
 
 = 9.2.2 - 2024-03-26 =
@@ -362,13 +370,13 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 = 9.1.2 - 2024-03-03 =
 * [DEV] Store Mutibanco Key used to generate reference
 * [DEV] Return Multibanco Key and requestId on the `get_multibanco_order_details()` method
-* [NEW] [PRO add-on 3.3](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Get ifthenpay fee on order screen if Backoffice Key is set and fee not yet set from the callback
+* [NEW] [PRO add-on 3.3](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Get ifthenpay fee on order screen if Backoffice Key is set and fee not yet set from the callback
 
 = 9.1.1 - 2024-03-03 =
 * [DEV] Allow filtering backoffice key
 
 = 9.1.0 - 2024-03-02 =
-* [NEW] [PRO add-on 3.2](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Store and show ifthenpay fees on order (Multibanco, MB WAY and Payshop)
+* [NEW] [PRO add-on 3.2](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Store and show ifthenpay fees on order (Multibanco, MB WAY and Payshop)
 * [DEV] Allow filtering callback URLs
 * [DEV] New `order_has_ifthenpay_method` method
 * [DEV] Tested with WordPress 6.5-beta3-57747 and WooCommerce 8.7.0-beta.2
@@ -391,7 +399,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Fix jQuery deprecation warning on the Multibanco settings screen
 
 = 8.9.2 - 2023-12-07 =
-* [PRO add-on 2.0](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Trigger Multibanco and MB WAY payments when creating orders via the REST API
+* [PRO add-on 2.0](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Trigger Multibanco and MB WAY payments when creating orders via the REST API
 
 = 8.9.1 - 2023-12-07 =
 * Fix Credit Card Callback testing when WP_DEBUG = true
@@ -407,7 +415,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Tested with WordPress 6.5-alpha-57150 and WooCommerce 8.4.0-beta.1
 
 = 8.8.0 - 2023-11-15 =
-* [PRO add-on 1.6](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Countdown timer on the “Thank you” page for MB WAY payments
+* [PRO add-on 1.6](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Countdown timer on the “Thank you” page for MB WAY payments
 * Tested with WordPress 6.5-alpha-57110, WooCommerce 8.3.0-rc.2 and WooCommerce Blocks 11.5.4
 
 = 8.7.0 - 2023-10-30 =
@@ -439,7 +447,7 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Tested with WordPress 6.3-alpha-55693 and WooCommerce 7.7.0-beta.2
 
 = 8.1.0 - 2023-04-04 =
-* [PRO add-on 1.3](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Recover unpaid MB WAY orders by converting them to Multibanco and notify the customer via email
+* [PRO add-on 1.3](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): Recover unpaid MB WAY orders by converting them to Multibanco and notify the customer via email
 * Fix a bug where old installs would incorrectly show the “MB Key or Entity and subentity” setting on the backoffice
 * Remove debug string from MB WAY settings
 * Add FAQ about why the MB WAY payment instructions are not send by email
@@ -494,11 +502,11 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * Tested with WordPress 6.1 and WooCommerce 7.1.0-rc.1
 
 = 6.4.0 - 2022-10-25 =
-* [PRO add-on 1.1](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): allow sending order number (for sequential order number plugins) instead of order id to the ifthenpay webservices and backoffice
+* [PRO add-on 1.1](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/): allow sending order number (for sequential order number plugins) instead of order id to the ifthenpay webservices and backoffice
 * Tested with WordPress 6.1-RC2-54684 and WooCommerce 7.1.0-beta.1
 
 = 6.3.0 - 2022-10-19 =
-* **New [PRO add-on](https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)**
+* **New [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/)**
 * Code refactoring when querying orders, cancel expiring orders
 * Suggest MB Key instead of Entity / Subentity
 * Replace “home banking” with “homebanking”

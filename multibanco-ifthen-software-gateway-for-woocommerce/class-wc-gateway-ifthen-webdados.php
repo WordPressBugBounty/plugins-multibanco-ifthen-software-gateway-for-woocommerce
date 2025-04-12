@@ -400,7 +400,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						'description' => __( 'Enable only for orders with a value up to x &euro;. Leave blank (or zero) to allow for any order value.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' <br/> ' . sprintf(
 							/* translators: %1$s: payment method, %2$s: minimum value, %3$s: maximum value */
 							__( 'By design, %1$s only allows payments from %2$s to %3$s. You can use this option to further limit this range.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-							__( 'Apple Pay, Google Pay, or Pix', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+							__( 'Apple Pay, Google Pay, or PIX', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							wc_price( WC_IfthenPay_Webdados()->gateway_ifthen_min_value, array( 'currency' => 'EUR' ) ),
 							wc_price( WC_IfthenPay_Webdados()->gateway_ifthen_max_value, array( 'currency' => 'EUR' ) )
 						),
@@ -1276,6 +1276,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				}
 			} else {
 				$error = 'Return from payment gateway (' . $server_request_uri . ') with missing arguments';
+				$error .= ' - ' . wp_json_encode( $_GET );
 			}
 
 			// Error and redirect

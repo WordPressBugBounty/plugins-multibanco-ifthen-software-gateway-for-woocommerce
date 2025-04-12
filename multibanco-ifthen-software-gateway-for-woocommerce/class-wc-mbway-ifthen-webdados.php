@@ -415,7 +415,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 				$pro_fake_fields[ $key ]['description'] .= sprintf(
 					/* translators: %1$s: link open, %2$s: link close */
 					__( 'Available on the %1$sPRO Add-on%2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-					'<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
+					'<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
 					'</a>'
 				);
 			}
@@ -1174,6 +1174,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 			}
 			// Empty awaiting payment session
 			unset( WC()->session->order_awaiting_payment );
+			do_action( 'mbway_ifthen_after_process_payment', $order, $phone );
 			// Return thankyou redirect
 			return array(
 				'result'   => 'success',

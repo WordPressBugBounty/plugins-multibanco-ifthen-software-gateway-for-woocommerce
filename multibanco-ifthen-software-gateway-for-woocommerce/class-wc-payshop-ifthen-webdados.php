@@ -403,7 +403,7 @@ if ( ! class_exists( 'WC_Payshop_IfThen_Webdados' ) ) {
 				$pro_fake_fields[ $key ]['description'] .= sprintf(
 					/* translators: %1$s: link open, %2$s: link close */
 					__( 'Available on the %1$sPRO Add-on%2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-					'<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
+					'<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
 					'</a>'
 				);
 			}
@@ -1058,7 +1058,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 							'val'        => WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ),
 						);
 						if ( $date_exp ) {
-							$details['exp'] = $date_exp->format( 'Y-m-d' ) . ' 23:59:59'; // Ticket #33847886 on PTWooPlugins.com
+							$details['exp'] = $date_exp->format( 'Y-m-d' ) . ' 23:59:59'; // Ticket #33847886 on nakedcatplugins.com
 						}
 						WC_IfthenPay_Webdados()->set_order_payshop_details( $order->get_id(), $details );
 						$this->debug_log( '- Payshop payment request created on ifthenpay servers - Order ' . $order->get_id() );

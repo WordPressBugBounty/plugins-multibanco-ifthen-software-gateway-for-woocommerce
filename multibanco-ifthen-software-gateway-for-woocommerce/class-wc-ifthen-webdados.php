@@ -64,7 +64,7 @@ final class WC_IfthenPay_Webdados {
 	public $multibanco_icon                        = '';
 	public $multibanco_api_mode_available          = true;
 	public $multibanco_api_mode_enabled            = false;
-	public $multibanco_api_url                     = 'https://ifthenpay.com/api/multibanco/reference/init';
+	public $multibanco_api_url                     = 'https://api.ifthenpay.com/multibanco/reference/init';
 
 
 	/* Internal variables - For MB WAY */
@@ -376,7 +376,7 @@ final class WC_IfthenPay_Webdados {
 	public function add_settings_link( $links ) {
 		$action_links = array();
 		if ( ! $this->pro_add_on_active ) {
-			$action_links['gopro'] = '<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( $this->out_link_utm ) . '" target="_blank" style="font-weight: bold;">' . esc_html__( 'Get the PRO add-on', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</a>';
+			$action_links['gopro'] = '<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( $this->out_link_utm ) . '" target="_blank" style="font-weight: bold;">' . esc_html__( 'Get the PRO add-on', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</a>';
 		}
 		$settings_links           = esc_html__( 'Settings:', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 		$settings_links          .= ' <a href="admin.php?page=wc-settings&amp;tab=checkout&amp;section=' . $this->multibanco_id . '">Multibanco</a>';
@@ -1524,7 +1524,7 @@ final class WC_IfthenPay_Webdados {
 	/**
 	 * Format MB WAY expiration date/time
 	 *
-	 * @param string  $exp      Expiration date in Y-m- H:i:s format.
+	 * @param string  $exp      Expiration date in Y-m-d H:i:s format.
 	 * @param integer $order_id The Order ID.
 	 * @return string
 	 */
@@ -3009,8 +3009,8 @@ final class WC_IfthenPay_Webdados {
 					'PT Woo Plugins'
 				);
 				?>
-				<a href="https://ptwooplugins.com<?php echo esc_attr( $this->out_link_utm ); ?>" title="<?php echo esc_attr( $title ); ?>" target="_blank">
-					<img src="<?php echo esc_url( plugins_url( 'images/ptwooplugins-plugins-for-wordpress.svg', __FILE__ ) ); ?>" width="200"/>
+				<a href="https://nakedcatplugins.com<?php echo esc_attr( $this->out_link_utm ); ?>" title="<?php echo esc_attr( $title ); ?>" target="_blank">
+					<img src="<?php echo esc_url( plugins_url( 'images/nakedcatplugins-plugins-for-wordpress.svg', __FILE__ ) ); ?>" width="200"/>
 				</a>
 			</p>
 			<h4><?php esc_html_e( 'Custom WordPress/WooCommerce development', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>:</h4>
@@ -3045,7 +3045,7 @@ final class WC_IfthenPay_Webdados {
 					// Custom fields
 					$premium_plugins = array(
 						array(
-							'url'         => 'https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/',
+							'url'         => 'https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/',
 							'title'       => esc_html__( 'Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce - PRO add-on', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'PRO add-on', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'addonpro.gif',
@@ -3057,19 +3057,19 @@ final class WC_IfthenPay_Webdados {
 							'image'       => 'invoicexpress-woocommerce.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/dpd-portugal-for-woocommerce/',
+							'url'         => 'https://nakedcatplugins.com/product/dpd-portugal-for-woocommerce/',
 							'title'       => esc_html__( 'DPD (Chronopost/SEUR) Portugal for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'DPD Portugal', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'dpd-portugal.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/dpd-seur-geopost-pickup-and-lockers-network-for-woocommerce/',
+							'url'         => 'https://nakedcatplugins.com/product/dpd-seur-geopost-pickup-and-lockers-network-for-woocommerce/',
 							'title'       => esc_html__( 'DPD / SEUR / Geopost Pickup and Lockers network for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'DPD Pickup', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'dpd-pickup.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/portuguese-postcodes-for-woocommerce-technical-support/',
+							'url'         => 'https://nakedcatplugins.com/product/portuguese-postcodes-for-woocommerce-technical-support/',
 							'title'       => esc_html__( 'Portuguese Postcodes for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'Portuguese Postcodes', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'postcodes.png',
@@ -3081,25 +3081,25 @@ final class WC_IfthenPay_Webdados {
 							'image'       => 'kuantokusta.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/simple-custom-fields-for-woocommerce-blocks-checkout/',
+							'url'         => 'https://nakedcatplugins.com/product/simple-custom-fields-for-woocommerce-blocks-checkout/',
 							'title'       => esc_html__( 'Simple Checkout Fields Manager for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'Blocks Checkout Custom Fields', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'woo-custom-fields.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/simple-woocommerce-order-approval/',
+							'url'         => 'https://nakedcatplugins.com/product/simple-woocommerce-order-approval/',
 							'title'       => esc_html__( 'Simple WooCommerce Order Approval', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'Order Approval', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'simple-woocommerce-order-approval-logo.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/shop-as-client-for-woocommerce-pro-add-on/',
+							'url'         => 'https://nakedcatplugins.com/product/shop-as-client-for-woocommerce-pro-add-on/',
 							'title'       => esc_html__( 'Shop as Client for WooCommerce PRO add-on', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'Shop as Client', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'shop-as-client.png',
 						),
 						array(
-							'url'         => 'https://ptwooplugins.com/product/taxonomy-term-and-role-based-discounts-for-woocommerce-pro-add-on/',
+							'url'         => 'https://nakedcatplugins.com/product/taxonomy-term-and-role-based-discounts-for-woocommerce-pro-add-on/',
 							'title'       => esc_html__( 'Taxonomy/Term and Role based Discounts for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'short_title' => esc_html__( 'Taxonomy based Discounts', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 							'image'       => 'taxonomy-discounts.png',
@@ -3133,7 +3133,7 @@ final class WC_IfthenPay_Webdados {
 			<div class="wc_ifthen_pro_ad">
 				<h4><?php esc_html_e( 'Want more features?', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>:</h4>
 				<p>
-					<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/<?php echo esc_attr( $this->out_link_utm ); ?>" target="_blank" style="font-weight: bold;">
+					<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/<?php echo esc_attr( $this->out_link_utm ); ?>" target="_blank" style="font-weight: bold;">
 						<?php esc_html_e( 'Get the PRO add-on of Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>
 					</a>
 				</p>

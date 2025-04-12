@@ -57,7 +57,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 			$this->has_fields = false;
 
 			$this->method_title       = __( 'Payment of Services at Multibanco', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' (ifthenpay)';
-			$this->method_description = __( 'Easy and simple payment using “Payment of Servicess” at any “Multibanco” ATM terminal or your homebanking service. (Only available to customers of Portuguese banks - Payment service provided by ifthenpay)', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+			$this->method_description = __( 'Easy and simple payment using “Payment of Services” at any “Multibanco” ATM terminal or your homebanking service. (Only available to customers of Portuguese banks - Payment service provided by ifthenpay)', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 			if ( WC_IfthenPay_Webdados()->wc_subscriptions_active && $this->get_option( 'support_woocommerce_subscriptions' ) === 'yes' ) {
 				$this->supports = array(
 					'products',
@@ -536,7 +536,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 				$pro_fake_fields[ $key ]['description'] .= sprintf(
 					/* translators: %1$s: link open, %2$s: link close */
 					__( 'Available on the %1$sPRO Add-on%2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-					'<a href="https://ptwooplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
+					'<a href="https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/' . esc_attr( WC_IfthenPay_Webdados()->out_link_utm ) . '" target="_blank">',
 					'</a>'
 				);
 			}

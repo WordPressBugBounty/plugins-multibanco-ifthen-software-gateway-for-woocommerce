@@ -430,7 +430,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 							echo wp_kses_post(
 								sprintf(
 									/* translators: %1$s: Callback URL, %2$s: Anti-phishing key */
-									esc_html__( 'Ask ifthenpay to activate Credit card Callback” on your account using this exact URL: %1$s and this Anti-phishing key: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+									esc_html__( 'Ask ifthenpay to activate “Credit card Callback” on your account using this exact URL: %1$s and this Anti-phishing key: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 									'<br/><code><strong>' . WC_IfthenPay_Webdados()->creditcard_notify_url . '</strong></code><br/>',
 									'<br/><code><strong>' . $this->secret_key . '</strong></code>'
 								)
