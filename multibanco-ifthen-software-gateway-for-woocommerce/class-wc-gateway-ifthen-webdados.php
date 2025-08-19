@@ -1044,8 +1044,9 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				),
 			);
 			$this->debug_log_extra( '- Request payment with args: ' . wp_json_encode( $args ) );
-			$args['body'] = wp_json_encode( $args['body'] ); // Json not post variables
-			$response     = wp_remote_post( $url, $args );
+			$debug_start_time = microtime( true );
+			$args['body']     = wp_json_encode( $args['body'] ); // Json not post variables
+			$response         = wp_remote_post( $url, $args );
 			if ( is_wp_error( $response ) ) {
 				$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
 				$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
@@ -1067,6 +1068,8 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 					);
 					$this->debug_log( '- ifthenpay Gateway payment request created on ifthenpay servers - Redirecting to payment gateway - Order ' . $order->get_id() . ' - Pincode: ' . $body->PinCode );
 					do_action( 'gateway_ifthen_created_reference', $body->PinCode, $order->get_id() );
+					$debug_elapsed_time = microtime( true ) - $debug_start_time;
+					$this->debug_log_extra( 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
 					return $body->RedirectUrl;
 				} else {
 					$debug_msg = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Can not json_decode body';
@@ -1665,7 +1668,10 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				// Not prevented by filter
 				( ! apply_filters( 'multibanco_ifthen_hide_newmethod_notifications', false ) )
 				&&
-				// Check if 90-day dismissal is active
+				// Check if dismissed in the last 180 days
+				( intval( get_user_meta( get_current_user_id(), $this->id . '_newmethod_notice_dismiss_until', true ) ) < time() )
+				&&
+				// Check if 90-day dismissal is active - Legacy support
 				( ! get_transient( $this->id . '_newmethod_notice_dismiss_' . get_current_user_id() ) )
 			) {
 				?>

@@ -969,8 +969,9 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 				),
 			);
 			$this->debug_log_extra( '- Request payment with args: ' . wp_json_encode( $args ) );
-			$args['body'] = wp_json_encode( $args['body'] ); // Json not post variables
-			$response     = wp_remote_post( $url, $args );
+			$debug_start_time = microtime( true );
+			$args['body']     = wp_json_encode( $args['body'] ); // Json not post variables
+			$response         = wp_remote_post( $url, $args );
 			if ( is_wp_error( $response ) ) {
 				$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
 				$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
@@ -993,6 +994,8 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 						);
 						$this->debug_log( '- Cofidis Pay payment request created on ifthenpay servers - Redirecting to payment gateway - Order ' . $order->get_id() . ' - requestId: ' . $body->requestId );
 						do_action( 'cofidispay_ifthen_created_reference', $body->requestId, $order->get_id() );
+						$debug_elapsed_time = microtime( true ) - $debug_start_time;
+						$this->debug_log_extra( 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
 						return $body->paymentUrl;
 					} else {
 						$debug_msg = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Error code and message: ' . $body->status . ' / ' . $body->Message;
@@ -1437,7 +1440,10 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 				// Not prevented by filter
 				( ! apply_filters( 'multibanco_ifthen_hide_newmethod_notifications', false ) )
 				&&
-				// Check if 90-day dismissal is active
+				// Check if dismissed in the last 180 days
+				( intval( get_user_meta( get_current_user_id(), $this->id . '_newmethod_notice_dismiss_until', true ) ) < time() )
+				&&
+				// Check if 90-day dismissal is active - Legacy support
 				( ! get_transient( $this->id . '_newmethod_notice_dismiss_' . get_current_user_id() ) )
 			) {
 				?>

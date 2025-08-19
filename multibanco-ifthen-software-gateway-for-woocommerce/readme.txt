@@ -2,9 +2,9 @@
 Contributors: nakedcatplugins, webdados, ifthenpay
 Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 10.4.1
+Stable tag: 10.5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,12 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 10.5.0 - 2025-08-19 =
+* [TWEAK] New payment method notices are now only shown every 180 days for each admin or shop manager user, and this is now handled by user meta and not a transient, because in some setups because transients are cleared when the cache is cleared
+* [FIX] Store MB KEY on the order meta when saving the Multibanco payment details
+* [DEV] Debug (extra) time it took on each API call
+* [DEV] Tested with WordPress 6.9-alpha-60645 and WooCommerce 10.1.0
 
 = 10.4.1 - 2025-05-22 =
 * [FIX] Check for WooCommerce version before declaring HPOS and Blocks checkout compatibility

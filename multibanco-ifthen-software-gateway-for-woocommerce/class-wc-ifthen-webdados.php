@@ -1474,6 +1474,7 @@ final class WC_IfthenPay_Webdados {
 			$order->update_meta_data( '_' . $this->multibanco_id . '_exp', $order_mb_details['exp'] );
 		}
 		if ( isset( $order_mb_details['RequestId'] ) ) {
+			$order->update_meta_data( '_' . $this->multibanco_id . '_mbkey', apply_filters( 'multibanco_ifthen_base_mbkey', $this->multibanco_settings['mbkey'], $order ) );
 			$order->update_meta_data( '_' . $this->multibanco_id . '_RequestId', $order_mb_details['RequestId'] );
 		}
 		$order->save();
@@ -1487,11 +1488,12 @@ final class WC_IfthenPay_Webdados {
 	 */
 	public function multibanco_clear_order_mb_details( $order_id ) {
 		$order = wc_get_order( $order_id );
+		$order->delete_meta_data( '_' . $this->multibanco_id . '_mbkey' );
+		$order->delete_meta_data( '_' . $this->multibanco_id . '_RequestId' );
 		$order->delete_meta_data( '_' . $this->multibanco_id . '_ent' );
 		$order->delete_meta_data( '_' . $this->multibanco_id . '_ref' );
 		$order->delete_meta_data( '_' . $this->multibanco_id . '_val' );
 		$order->delete_meta_data( '_' . $this->multibanco_id . '_exp' );
-		$order->delete_meta_data( '_' . $this->multibanco_id . '_RequestId' );
 		$order->save();
 	}
 
@@ -1761,8 +1763,9 @@ final class WC_IfthenPay_Webdados {
 						// Temos de calcular a data e guardar mais lá à frente
 					}
 					$this->debug_log_extra( $this->multibanco_id, '- Request payment with args: ' . wp_json_encode( $args ) );
-					$args['body'] = wp_json_encode( $args['body'] );
-					$response     = wp_remote_post( $url, $args );
+					$debug_start_time = microtime( true );
+					$args['body']     = wp_json_encode( $args['body'] );
+					$response         = wp_remote_post( $url, $args );
 					if ( is_wp_error( $response ) ) {
 						$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
 						$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
@@ -1803,6 +1806,8 @@ final class WC_IfthenPay_Webdados {
 									$this->debug_log( $this->multibanco_id, 'Because of WooCommerce Deposits a new reference will be generated for Order ' . $order->get_id() );
 									$this->multibanco_action_deposits_set = true;
 								}
+								$debug_elapsed_time = microtime( true ) - $debug_start_time;
+								$this->debug_log_extra( $this->multibanco_id, 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
 								return $details;
 							} else {
 								$debug_msg       = '- Error: ' . trim( $body->Message ) . ' - Order ' . $order->get_id();
@@ -2123,7 +2128,8 @@ final class WC_IfthenPay_Webdados {
 			),
 		);
 		$this->debug_log_extra( $this->mbway_id, '- Request payment with args: ' . wp_json_encode( $args ) );
-		$response = wp_remote_post( $url, $args );
+		$debug_start_time = microtime( true );
+		$response         = wp_remote_post( $url, $args );
 		if ( is_wp_error( $response ) ) {
 			$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
 			$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
@@ -2152,6 +2158,8 @@ final class WC_IfthenPay_Webdados {
 								$this->debug_log( $this->mbway_id, '- MB WAY payment request created on ifthenpay servers - Order ' . $order->get_id() . ' - id_pedido: ' . $id_pedido );
 							}
 							do_action( 'mbway_ifthen_created_reference', $id_pedido, $order->get_id(), $phone );
+							$debug_elapsed_time = microtime( true ) - $debug_start_time;
+							$this->debug_log_extra( $this->mbway_id, 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
 							return true;
 						} else {
 							$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Incorrect "Valor"';
@@ -3727,14 +3735,14 @@ final class WC_IfthenPay_Webdados {
 			wp_send_json_error( 'Missing method ID' );
 			exit;
 		}
-		// Set transient with 90-day expiration (90 days * 24 hours * 60 minutes * 60 seconds)
-		$result = set_transient(
-			$method_id . '_newmethod_notice_dismiss_' . get_current_user_id(),
-			true,
-			90 * DAY_IN_SECONDS
-		);
+		// Set transient with 90-day expiration (90 days * 24 hours * 60 minutes * 60 seconds) - Now 180 days
+		// Removed in favor of user meta, to avoid showing again when cleaning cache
+		// This needs to be a option per user because transients are cleared when the cache is cleared
+		$days                 = 180;
+		$expiration_timestamp = time() + ( $days * DAY_IN_SECONDS );
+		update_user_meta( get_current_user_id(), $method_id . '_newmethod_notice_dismiss_until', $expiration_timestamp );
 		wp_send_json_success(
-			array( 'result' => $result )
+			array( 'result' => true )
 		);
 		exit;
 	}
