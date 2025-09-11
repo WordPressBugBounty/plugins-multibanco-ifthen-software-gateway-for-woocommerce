@@ -4,7 +4,7 @@ Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 10.5.0
+Stable tag: 11.0.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,12 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 11.0.0 - 2025-09-11 =
+* [NEW] It’s now possible to use international phone numbers for MB WAY (can be disabled on the payment method options)
+* [DEV] Use ifthenpay’s MB WAY most recent API endpoint
+* [DEV] Compare values with two decimal places when checking for a possible order value change
+* [DEV] Tested with WordPress 6.9-alpha-60725 and WooCommerce 10.2.0-beta.2
 
 = 10.5.0 - 2025-08-19 =
 * [TWEAK] New payment method notices are now only shown every 180 days for each admin or shop manager user, and this is now handled by user meta and not a transient, because in some setups because transients are cleared when the cache is cleared

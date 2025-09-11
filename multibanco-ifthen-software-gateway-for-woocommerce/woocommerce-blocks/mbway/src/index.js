@@ -15,8 +15,6 @@ const defaultLabel = __(
 ) + ' (ifthenpay)';
 const label = decodeEntities( settings.title ) || defaultLabel;
 
-//const [mbwayPhoneNumber, setMbwayPhoneNumber] = useState(''); //If I set it here, i get "invalid hook call"
-
 /**
  * Content component
  *
@@ -24,15 +22,28 @@ const label = decodeEntities( settings.title ) || defaultLabel;
  */
 const Content = ( props ) => {
 	/* Data to send to the server - https://github.com/woocommerce/woocommerce-blocks/blob/trunk/docs/internal-developers/block-client-apis/checkout/checkout-api.md#passing-a-value-from-the-client-through-to-server-side-payment-processing */
-	const [ mbwayPhoneNumber, setMbwayPhoneNumber ] = useState( settings.default_number ); // This works but mbwayPhoneNumber is not available inside onPaymentProcessing below
-	const { eventRegistration, emitResponse } = props;
-	const { onPaymentProcessing } = eventRegistration;
+	const [ mbwayPhoneNumber, setMbwayPhoneNumber ] = useState( settings.default_number ); // This works but mbwayPhoneNumber is not available inside onPaymentSetup below
+	const [ mbwayCountryCode, setMbwayCountryCode ] = useState( settings.default_country_code );
+	const { eventRegistration, emitResponse }       = props;
+	const { onPaymentSetup }                        = eventRegistration; // onPaymentProcessing deprecated - use onPaymentSetup instead
 	useEffect( () => {
-		const unsubscribe = onPaymentProcessing( async () => {
+		const unsubscribe = onPaymentSetup( async () => {
+
 			// Here we can do any processing we need, and then emit a response.
 			// For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
-			const mbway_ifthen_for_woocommerce_phone = mbwayPhoneNumber; // This will need to be the value of the input field
-			const customDataIsValid = ( mbway_ifthen_for_woocommerce_phone.length === 9 );
+			const mbway_ifthen_for_woocommerce_phone        = mbwayPhoneNumber; // This will need to be the value of the input field
+			const mbway_ifthen_for_woocommerce_country_code = mbwayCountryCode; // This will need to be the value of the select field
+			const customDataIsValid = (
+				// If international is allowed and it's not PT, allow any number length
+				settings.allow_international && mbway_ifthen_for_woocommerce_country_code !== 'PT'
+			)
+			||
+			(
+				// If international is not allowed or it's PT, number length must be 9 and start with 9
+				mbway_ifthen_for_woocommerce_phone.length === 9
+				&&
+				mbway_ifthen_for_woocommerce_phone.charAt( 0 ) === '9'
+			);
 
 			if ( customDataIsValid ) {
 				return {
@@ -40,6 +51,7 @@ const Content = ( props ) => {
 					meta: {
 						paymentMethodData: applyFilters( 'mbway_ifthen_blocks_checkout_payment_data', {
 							mbway_ifthen_for_woocommerce_phone,
+							mbway_ifthen_for_woocommerce_country_code,
 						} ),
 					},
 				};
@@ -60,43 +72,131 @@ const Content = ( props ) => {
 	}, [
 		emitResponse.responseTypes.ERROR,
 		emitResponse.responseTypes.SUCCESS,
-		onPaymentProcessing,
-		mbwayPhoneNumber
+		onPaymentSetup,
+		mbwayPhoneNumber,
+		mbwayCountryCode
 	] );
+
+	/* Select value */
+	const HandleMBWayCountryChange = ( event ) => {
+		const value = event.target.value;
+		setMbwayCountryCode( value );
+		// If PT is selected, validate for Portuguese mobile number format
+		const phoneInput = document.getElementById( settings.id + '_phone' );
+		if ( phoneInput ) {
+			if ( value === 'PT' ) {
+				phoneInput.maxLength = 9;
+			} else {
+				phoneInput.maxLength = 99;
+			}
+		}
+	};
+
 	/* Input value */
 	const HandleMBWayChange = ( event ) => {
-		const value = event.target.value.replace(/\D/g, "");
+		const value = event.target.value.replace( /\D/g, "" ); // Remove non-numeric characters
 		setMbwayPhoneNumber( value );
 	};
+
 	/* Content */
 	// Description
 	var description = React.createElement( 'p', null, decodeEntities( settings.description || '' ) );
+	// If international allowed, show prefix selector
+	if ( settings.allow_international ) {
+		// Convert object to array if needed
+		const countryOptions = settings.country_code_options && typeof settings.country_code_options === 'object' 
+			? Object.entries( settings.country_code_options ).map( ( [ countryCode, countryData ] ) => {
+				return {
+					code:    countryCode,
+					display: countryData.display
+				};
+			})
+			: [{ code: 'PT', value: '+351', display: 'Portugal (+351)' }];
+		var countrycodeselect = React.createElement(
+			'select',
+			{
+				name:      settings.id + '_country_code',
+				id:        settings.id + '_country_code',
+				className: 'wc-blocks-components-select__select',
+				options:   countryOptions,
+				required:  true,
+				value:     mbwayCountryCode,
+				onChange:  HandleMBWayCountryChange
+			},
+			// Map the transformed array to option elements
+			countryOptions.map( country => 
+				React.createElement(
+					'option',
+					{
+						key: country.code,
+						value: country.code
+					},
+					country.display
+				)
+			)
+		);
+		if ( settings.default_country_code === 'PT' ) {
+			var maxInputLength = '9';
+		} else {
+			var maxInputLength = '99';
+		}
+	} else {
+		var countrycodeselect = null;
+		var maxInputLength    = '9';
+	}
+
 	// Input field
 	var phonenumberinput = React.createElement( 'input', {
 		type:         'tel',
-		name:         settings.id+'_phone',
-		id:           settings.id+'_phone',
+		name:         settings.id + '_phone',
+		id:           settings.id + '_phone',
 		placeholder:  '9xxxxxxxx',
 		autoComplete: 'off',
-		maxLength:    '9',
+		maxLength:    maxInputLength,
 		required:     true,
 		value:        mbwayPhoneNumber,
 		onChange:     HandleMBWayChange
 	} );
+
 	// Label inside field
 	var phonenumberlabel = React.createElement( 'label', {
 		htmlFor: settings.id + '_phone'
 	}, decodeEntities( settings.phonenumbertext || '' ) );
+
 	// Extend before phone number
 	var beforePhoneNumber = applyFilters( 'mbway_ifthen_blocks_checkout_before_phone_number', null );
+
+	// Country code selector
+	if ( settings.allow_international ) {
+		// Label inside field
+		var countrycodelabel = React.createElement( 'label', {
+			htmlFor:   settings.id + '_country_code',
+			className: 'wc-blocks-components-select__label'
+		}, __(
+			'Country code',
+			'multibanco-ifthen-software-gateway-for-woocommerce'
+		) );
+		// Select field
+		var countrycode = React.createElement( 'div', {
+			className: 'wc-blocks-components-select__container'
+		}, '', countrycodelabel, countrycodeselect );
+		var countrycode = React.createElement( 'div', {
+			className: 'wc-blocks-components-select'
+		}, '', countrycode );
+	} else {
+		var countrycode = null;
+	}
+
 	// Phone number: input + label
 	var phonenumber = React.createElement( 'div', {
 		className: 'wc-block-components-text-input is-active'
 	}, '', phonenumberinput, phonenumberlabel );
+
 	// Extend after phone number
 	var afterPhoneNumber = applyFilters( 'mbway_ifthen_blocks_checkout_after_phone_number', null );
+
 	// Return Content
-	return React.createElement( 'div', null, description, beforePhoneNumber, phonenumber, afterPhoneNumber );
+	return React.createElement( 'div', null, description, beforePhoneNumber, countrycode, phonenumber, afterPhoneNumber );
 };
 
 /**
@@ -117,17 +217,17 @@ const Label = ( props ) => {
  * @param checkoutData Checkout details.
  */
 const CanMakePayment = ( checkoutData ) => {
-	//Euro?
+	// Euro?
 	if ( checkoutData.cartTotals.currency_code != 'EUR' ) {
 		return false;
 	}
-	//Portugal?
+	// Portugal?
 	if ( settings.only_portugal ) {
 		if ( checkoutData.billingData.country != 'PT' && checkoutData.shippingAddress.country != 'PT' ) {
 			return false;
 		}
 	}
-	//Minimum and maximum value
+	// Minimum and maximum value
 	var cart_total = checkoutData.cartTotals.total_price / 100; //It's return in cents (?)
 	if ( settings.only_above ) {
 		if ( cart_total < settings.only_above ) {
@@ -146,14 +246,14 @@ const CanMakePayment = ( checkoutData ) => {
  * MBWAY payment method config object.
  */
 const ifthenpayMbWayPaymentMethod = {
-	name: 'mbway_ifthen_for_woocommerce',
-	label: React.createElement( Label, null ),
-	content: React.createElement( Content, null ),
-	edit: React.createElement( Content, null ),
-	icons: null,
+	name:           'mbway_ifthen_for_woocommerce',
+	label:          React.createElement( Label, null ),
+	content:        React.createElement( Content, null ),
+	edit:           React.createElement( Content, null ),
+	icons:          null,
 	canMakePayment: CanMakePayment,
-	ariaLabel: label,
-	supports: {
+	ariaLabel:      label,
+	supports:       {
 		features: settings.supports,
 	},
 };
