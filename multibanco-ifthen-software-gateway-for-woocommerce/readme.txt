@@ -4,7 +4,7 @@ Tags: multibanco, mbway, payshop, card, cofidis
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 11.0.0
+Stable tag: 11.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -23,7 +23,7 @@ Holders of a Brazilian bank account can conveniently pay for WooCommerce orders 
 
 This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract with this company is required. Technical support is provided by [Naked Cat Plugins](https://nakedcatplugins.com) (by [Webdados](https://www.webdados.pt)) on the [WordPress.org support forums](https://wordpress.org/support/plugin/multibanco-ifthen-software-gateway-for-woocommerce/).
 
-**Fully compatible with the new [High-Performance Order Storage](https://woocommerce.com/posts/platform-update-high-performance-order-storage-for-woocommerce/) and [WooCommerce Checkout Blocks](https://woocommerce.com/checkout-blocks/).**
+**Fully compatible with the new [High-Performance Order Storage](https://woocommerce.com/posts/platform-update-high-performance-order-storage-for-woocommerce/) (HPOS) and the [WooCommerce block-based checkout](https://woocommerce.com/checkout-blocks/).**
 
 = Features: =
 
@@ -40,7 +40,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 * Shop owner can set minimum and maximum order totals for each payment gateway to be available;
 * Ability to reduce stock when the order is created or paid;
 * Allows searching orders (in the admin area) by Multibanco or Payshop reference;
-* High-Performance Order Storage compatible;
+* High-Performance Order Storage (HPOS) compatible;
 * Block-Based Checkout compatible;
 * WPML compatible (for multilingual shops);
 * Polylang tested;
@@ -231,11 +231,11 @@ ifthenpay’s privacy policy can be found at [https://ifthenpay.com/termosCondic
 
 = Is this plugin compatible with the new WooCommerce High-Performance Order Storage? =
 
-Yes.
+Yes. This plugin is fully compatible with HPOS since December 2022.
 
-= Is this plugin compatible with the new WooCommerce block-based Cart and Checkout? =
+= Is this plugin compatible with the WooCommerce Cart and Checkout Blocks? =
 
-Yes.
+Yes. This plugin is compatible with HPOS since August 2020.
 
 = I need technical support. Who should I contact, ifthenpay or Webdados? =
 
@@ -254,6 +254,13 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 11.1.0 - 2025-09-22 =
+* [DEV] Change some remaining `wc_get_orders` calls to our internal wrapper
+* [DEV] Use WooCommerce internal method to get international calling codes for MB WAY numbers
+* [DEV] Fix version upgrade routine
+* [DEV] Remove autoload from some options
+* [DEV] Tested with WordPress 6.9-alpha-60789 and WooCommerce 10.2.1
 
 = 11.0.0 - 2025-09-11 =
 * [NEW] It’s now possible to use international phone numbers for MB WAY (can be disabled on the payment method options)

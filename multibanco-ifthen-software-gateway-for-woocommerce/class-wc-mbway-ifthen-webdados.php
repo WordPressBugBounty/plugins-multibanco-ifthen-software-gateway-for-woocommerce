@@ -80,7 +80,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 				$this->update_option( 'secret_key', $this->secret_key );
 				$this->update_option( 'debug', 'yes' );
 				// Let's set the callback activation email as NOT sent
-				update_option( $this->id . '_callback_email_sent', 'no' );
+				update_option( $this->id . '_callback_email_sent', 'no', false );
 			}
 
 			// on hold or pending?
@@ -171,7 +171,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 		 * Upgrades (if needed)
 		 */
 		private function upgrade() {
-			if ( $this->get_option( 'version' ) < $this->version ) {
+			if ( version_compare( $this->get_option( 'version' ), $this->version, '<' ) ) {
 				$current_options = get_option( 'woocommerce_' . $this->id . '_settings', '' );
 				if ( ! is_array( $current_options ) ) {
 					$current_options = array();
@@ -179,7 +179,12 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 				// Upgrade
 				$this->debug_log( 'Upgrade to ' . $this->version . ' started' );
 				// Specific versions upgrades should be here
-				// ...
+				// Update routines when upgrading to 11.0.1 or above - Fix some autoloaded options
+				if ( version_compare( $this->get_option( 'version' ), '11.0.1', '<' ) ) {
+					$value = get_option( $this->id . '_callback_email_sent' );
+					delete_option( $this->id . '_callback_email_sent' );
+					update_option( $this->id . '_callback_email_sent', $value, false );
+				}
 				// Upgrade on the database - Risky?
 				$current_options['version'] = $this->version;
 				update_option( 'woocommerce_' . $this->id . '_settings', $current_options );
@@ -471,7 +476,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 						<small>v.<?php echo esc_html( $this->version ); ?></small>
 						<?php
 						if ( function_exists( 'wc_back_link' ) ) {
-							wc_back_link( __( 'Return to payments', 'woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=checkout' ) );
+							wc_back_link( __( 'Return to payments', 'woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						}
 						?>
 					</h2>
@@ -593,7 +598,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 								<br/><br/>
 								<button id="wc_ifthen_callback_submit" class="button" type="button"><?php esc_html_e( 'Ask for Callback activation', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?> - <?php esc_html_e( 'Via email (old method)', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></button>
 								<input id="wc_ifthen_callback_cancel" class="button" type="button" value="<?php esc_html_e( 'Cancel', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>"/>
-								<input type="hidden" name="save" value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>"/> <!-- Force action woocommerce_update_options_payment_gateways_ to run, from WooCommerce 3.5.5 -->
+								<input type="hidden" name="save" value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>"/> <!-- Force action woocommerce_update_options_payment_gateways_ to run, from WooCommerce 3.5.5 --> <?php //phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?>
 							</p>
 						</div>
 						<?php
@@ -675,7 +680,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 				// Webservice
 				$result = WC_IfthenPay_Webdados()->callback_webservice( $bo_key, 'MBWAY', $this->mbwaykey, $this->secret_key, WC_IfthenPay_Webdados()->mbway_notify_url );
 				if ( $result['success'] ) {
-					update_option( $this->id . '_callback_email_sent', 'yes' );
+					update_option( $this->id . '_callback_email_sent', 'yes', false );
 					WC_Admin_Settings::add_message( __( 'The â€œCallbackâ€ activation request has been submited to ifthenpay via API and is now active.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
 				} else {
 					WC_Admin_Settings::add_error(
@@ -706,7 +711,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 					'Cc: ' . $cc,
 				);
 				if ( wp_mail( $to, $subject, $message, $headers ) ) {
-					update_option( $this->id . '_callback_email_sent', 'yes' );
+					update_option( $this->id . '_callback_email_sent', 'yes', false );
 					WC_Admin_Settings::add_message( __( 'The â€œCallbackâ€ activation request has been submited to ifthenpay. Wait for their feedback.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
 				} else {
 					WC_Admin_Settings::add_error( __( 'The â€œCallbackâ€ activation request could not be sent. Check if your WordPress install can send emails.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
@@ -1149,9 +1154,9 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 					if ( empty( $country_code ) ) {
 						$country_code = 'PT';
 					}
-					$countries = WC_IfthenPay_Webdados()->get_all_international_calling_codes();
-					if ( isset( $countries[ $country_code ] ) && ! empty( $countries[ $country_code ] ) ) {
-						$phone = $countries[ $country_code ] . '#' . $phone;
+					$calling_code = WC()->countries->get_country_calling_code( $country_code );
+					if ( ! empty( $calling_code ) ) {
+						$phone = trim( str_replace( '+', '', $calling_code ) . '#' . $phone );
 					}
 				}
 				if ( ! empty( $phone ) ) {
@@ -1276,10 +1281,10 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 								?>
 							</select>
 						</span>
-						<input type="tel" autocomplete="off" class="input-text" name="<?php echo esc_attr( $this->id ); ?>_phone" id="<?php echo esc_attr( $this->id ); ?>_phone" value="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_default_phone_number', '' ) ); ?>"/>
+						<input type="tel" autocomplete="off" class="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_phone_input_class', 'input-text' ) ); ?>" name="<?php echo esc_attr( $this->id ); ?>_phone" id="<?php echo esc_attr( $this->id ); ?>_phone" value="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_default_phone_number', '' ) ); ?>"/>
 					</div>
 				<?php } else { ?>
-					<input type="tel" autocomplete="off" class="input-text" name="<?php echo esc_attr( $this->id ); ?>_phone" id="<?php echo esc_attr( $this->id ); ?>_phone" placeholder="9xxxxxxxx" maxlength="9" value="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_default_phone_number', '' ) ); ?>"/>
+					<input type="tel" autocomplete="off" class="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_phone_input_class', 'input-text' ) ); ?>" name="<?php echo esc_attr( $this->id ); ?>_phone" id="<?php echo esc_attr( $this->id ); ?>_phone" placeholder="9xxxxxxxx" maxlength="9" value="<?php echo esc_attr( apply_filters( 'mbway_ifthen_checkout_default_phone_number', '' ) ); ?>"/>
 				<?php } ?>
 				<?php do_action( 'mbway_ifthen_checkout_after_phone_number' ); ?>
 			</div>
@@ -1479,7 +1484,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 							'limit'                        => -1,
 							'_' . $this->id . '_id_pedido' => $id_pedido,
 						);
-						$orders         = wc_get_orders( WC_IfthenPay_Webdados()->maybe_translate_order_query_args( $args ) );
+						$orders         = WC_IfthenPay_Webdados()->wc_get_orders( $args, $this->id );
 						if ( count( $orders ) > 0 ) {
 							$orders_exist = true;
 							$orders_count = count( $orders );
@@ -1577,7 +1582,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 							'limit'                        => -1,
 							'_' . $this->id . '_id_pedido' => $id_pedido,
 						);
-						$orders = wc_get_orders( WC_IfthenPay_Webdados()->maybe_translate_order_query_args( $args ) );
+						$orders = WC_IfthenPay_Webdados()->wc_get_orders( $args, $this->id );
 						if ( ! empty( $orders ) ) {
 							if ( count( $orders ) === 1 ) {
 								$order       = $orders[0];
@@ -1597,7 +1602,7 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 								'orderby' => 'modified',
 								'order'   => 'ASC',                        // Oldest recent refunds first, so we process them in order if there are several
 							);
-							$refunds = wc_get_orders( WC_IfthenPay_Webdados()->maybe_translate_order_query_args( $args ) );
+							$refunds = WC_IfthenPay_Webdados()->wc_get_orders( $args, $this->id );
 							foreach ( $refunds as $refund ) {
 								if ( $refund->get_meta( '_' . WC_IfthenPay_Webdados()->mbway_id . '_callback_received' ) === '' ) {
 									if ( abs( floatval( $val ) ) === abs( floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $refund ) ) ) ) {
@@ -1712,7 +1717,9 @@ Email enviado automaticamente do plugin WordPress â€œifthenpay for WooCommerceâ€
 			) {
 				$callback_email_sent = get_option( $this->id . '_callback_email_sent' );
 				if ( $callback_email_sent === 'no' || $callback_email_sent === false ) {
-					if ( ! isset( $_GET['callback_warning'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					// phpcs:disable WordPress.Security.NonceVerification.Recommended
+					if ( ! isset( $_GET['callback_warning'] ) ) {
+						// phpcs:enable WordPress.Security.NonceVerification.Recommended
 						if ( apply_filters( 'mbway_ifthen_show_callback_notice', true ) ) {
 							?>
 							<div id="mbway_ifthen_callback_notice" class="notice notice-error" style="padding-right: 38px; position: relative;">

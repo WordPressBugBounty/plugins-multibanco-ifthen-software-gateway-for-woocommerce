@@ -178,7 +178,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 		 * Upgrades (if needed)
 		 */
 		private function upgrade() {
-			if ( $this->get_option( 'version' ) < $this->version ) {
+			if ( version_compare( $this->get_option( 'version' ), $this->version, '<' ) ) {
 				$current_options = get_option( 'woocommerce_' . $this->id . '_settings', '' );
 				if ( ! is_array( $current_options ) ) {
 					$current_options = array();
@@ -186,7 +186,6 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				// Upgrade
 				$this->debug_log( 'Upgrade to ' . $this->version . ' started' );
 				// Specific versions upgrades should be here
-				// ...
 				// Upgrade on the database - Risky?
 				$current_options['version'] = $this->version;
 				update_option( 'woocommerce_' . $this->id . '_settings', $current_options );
@@ -500,7 +499,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						<small>v.<?php echo esc_html( $this->version ); ?></small>
 						<?php
 						if ( function_exists( 'wc_back_link' ) ) {
-							wc_back_link( __( 'Return to payments', 'woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=checkout' ) );
+							wc_back_link( __( 'Return to payments', 'woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ); //phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						}
 						?>
 					</h2>
@@ -1451,7 +1450,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 							'limit' => -1,
 							'_' . $this->id . '_request_id' => $request_id,
 						);
-						$orders = wc_get_orders( WC_IfthenPay_Webdados()->maybe_translate_order_query_args( $args ) );
+						$orders = WC_IfthenPay_Webdados()->wc_get_orders( $args, $this->id );
 						if ( ! empty( $orders ) ) {
 							if ( count( $orders ) === 1 ) {
 								$order       = $orders[0];
@@ -1471,7 +1470,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 								'orderby' => 'modified',
 								'order'   => 'ASC',                        // Oldest recent refunds first, so we process them in order if there are several
 							);
-							$refunds = wc_get_orders( WC_IfthenPay_Webdados()->maybe_translate_order_query_args( $args ) );
+							$refunds = WC_IfthenPay_Webdados()->wc_get_orders( $args, $this->id );
 							foreach ( $refunds as $refund ) {
 								if ( $refund->get_meta( '_' . WC_IfthenPay_Webdados()->gateway_ifthen_id . '_callback_received' ) === '' ) {
 									if ( abs( floatval( $val ) ) === abs( floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $refund ) ) ) ) {
