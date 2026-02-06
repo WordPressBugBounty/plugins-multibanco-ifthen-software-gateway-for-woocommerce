@@ -16,6 +16,7 @@ final class WC_IfthenPay_Webdados {
 	public $version = false;
 
 	/* IDs */
+	public $id                = 'ifthen_for_woocommerce'; // Plugin ID
 	public $multibanco_id     = 'multibanco_ifthen_for_woocommerce';
 	public $mbway_id          = 'mbway_ifthen_for_woocommerce';
 	public $payshop_id        = 'payshop_ifthen_for_woocommerce';
@@ -77,7 +78,6 @@ final class WC_IfthenPay_Webdados {
 	public $mbway_banner_email           = '';
 	public $mbway_banner                 = '';
 	public $mbway_icon                   = '';
-	public $mbway_webservice_url         = 'https://mbway.ifthenpay.com/IfthenPayMBW.asmx';
 	public $mbway_api_url                = 'https://api.ifthenpay.com/spg/payment/mbway';
 
 
@@ -134,6 +134,7 @@ final class WC_IfthenPay_Webdados {
 	 * @param string $version The plugin version.
 	 */
 	public function __construct( $version ) {
+		// Check version
 		$this->version           = $version;
 		$this->pro_add_on_active = function_exists( 'WC_IfthenPay_Pro' );
 		$this->wpml_active       = function_exists( 'icl_object_id' ) && function_exists( 'icl_register_string' );
@@ -237,6 +238,8 @@ final class WC_IfthenPay_Webdados {
 			:
 			home_url( '/wc-api/WC_GatewayReturn_IfThen_Webdados/' )
 		);
+		// Upgrade
+		$this->upgrade();
 		// Hooks
 		$this->init_hooks();
 	}
@@ -252,6 +255,58 @@ final class WC_IfthenPay_Webdados {
 			self::$_instance = new self( $version );
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * Upgrades (if needed)
+	 */
+	private function upgrade() {
+		$db_version = get_option( $this->id . '_version', '' );
+		if ( version_compare( $db_version, $this->version, '<' ) ) {
+			$this->debug_log( $this->id, 'Upgrade from ' . $db_version . ' to ' . $this->version . ' started' );
+			// Update routines when upgrading to 11.3 or above - Remove old cron
+			if ( version_compare( $db_version, '11.3', '<' ) ) {
+				wp_clear_scheduled_hook( 'wc_ifthen_hourly_cron' );
+			}
+			// Update routines when upgrading to 11.3.2 or above - Clear Action Scheduler errors
+			if ( version_compare( $db_version, '11.3.2', '<' ) ) {
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				global $wpdb;
+				// Get action IDs for wc_ifthen_hourly_cron with failed status
+				$failed_action_ids = $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT action_id FROM {$wpdb->prefix}actionscheduler_actions 
+						WHERE hook = %s AND status = 'failed'",
+						'wc_ifthen_hourly_cron'
+					)
+				);
+				if ( ! empty( $failed_action_ids ) ) {
+					// Delete the failed actions
+					$wpdb->query(
+						$wpdb->prepare(
+							"DELETE FROM {$wpdb->prefix}actionscheduler_actions 
+							WHERE hook = %s AND status = 'failed'",
+							'wc_ifthen_hourly_cron'
+						)
+					);
+					// Delete associated logs
+					$ids_placeholder = implode( ',', array_fill( 0, count( $failed_action_ids ), '%d' ) );
+					$wpdb->query(
+						$wpdb->prepare(
+							"DELETE FROM {$wpdb->prefix}actionscheduler_logs 
+							WHERE action_id IN ($ids_placeholder)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+							$failed_action_ids
+						)
+					);
+					$this->debug_log( $this->id, 'Cleared ' . count( $failed_action_ids ) . ' failed Action Scheduler entries for wc_ifthen_hourly_cron' );
+				} else {
+					$this->debug_log( $this->id, 'No failed Action Scheduler entries found for wc_ifthen_hourly_cron' );
+				}
+				// phpcs:enable
+			}
+			update_option( $this->id . '_version', $this->version );
+			$this->debug_log( $this->id, 'Upgrade from ' . $db_version . ' to ' . $this->version . ' finished' );
+		}
 	}
 
 	/**
@@ -298,10 +353,16 @@ final class WC_IfthenPay_Webdados {
 			}
 		);
 		add_filter( 'woocommerce_valid_order_statuses_for_payment', array( $this, 'woocommerce_valid_order_statuses_for_payment' ), PHP_INT_MAX, 2 );
-		// Create cron
-		if ( ! wp_next_scheduled( 'wc_ifthen_hourly_cron' ) ) {
-			wp_schedule_event( time(), 'hourly', 'wc_ifthen_hourly_cron' );
-		}
+		// Create Action Scheduler recurring action instead of WP Cron
+		add_action(
+			'init',
+			function () {
+				if ( ! as_next_scheduled_action( 'wc_ifthen_hourly_cron' ) ) {
+					as_schedule_recurring_action( time(), HOUR_IN_SECONDS, 'wc_ifthen_hourly_cron', array(), 'wc-ifthen' );
+				}
+			}
+		);
+		add_action( 'wc_ifthen_hourly_cron', array( $this, 'action_scheduler_do_nothing' ) );
 		// Cancel orders with expired references - Multibanco (after_setup_theme so it runs after theme's functions.php file)
 		add_action(
 			'after_setup_theme',
@@ -477,7 +538,7 @@ final class WC_IfthenPay_Webdados {
 	/**
 	 * Debug / Log
 	 *
-	 * @param string $gateway_id    The payment gateway ID.
+	 * @param string $gateway_id    The payment gateway ID or the main plugin ID.
 	 * @param string $message       The message to debug.
 	 * @param string $level         The debug level.
 	 * @param bool   $debug_email   Email address, if to send to email.
@@ -488,7 +549,7 @@ final class WC_IfthenPay_Webdados {
 			$this->log = wc_get_logger(); // Init log
 		}
 		$this->log->$level( $message, array( 'source' => $gateway_id ) );
-		if ( $debug_email ) {
+		if ( ! empty( $debug_email ) ) {
 			if ( empty( $email_message ) ) {
 				$email_message = $message;
 			}
@@ -1689,6 +1750,11 @@ final class WC_IfthenPay_Webdados {
 	 * @return array or string with error.
 	 */
 	public function multibanco_get_ref( $order_id, $force_change = false, $throw_exception = false ) {
+		$debug       = $this->multibanco_settings['debug'] === 'yes';
+		$debug_email = false;
+		if ( $debug ) {
+			$debug_email = trim( $this->multibanco_settings['debug_email'] ) !== '' ? trim( $this->multibanco_settings['debug_email'] ) : false;
+		}
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$order = wc_get_order( $order_id );
 		$this->debug_log_extra( $this->multibanco_id, 'multibanco_get_ref - Force change: ' . ( $force_change ? 'true' : 'false' ) . ' - Order ' . $order->get_id() );
@@ -1770,7 +1836,7 @@ final class WC_IfthenPay_Webdados {
 					if ( is_wp_error( $response ) ) {
 						$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
 						$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-						$this->debug_log( $this->multibanco_id, $debug_msg, 'error', true, $debug_msg_email );
+						$this->debug_log( $this->multibanco_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 						return false;
 					} elseif ( isset( $response['response']['code'] ) && intval( $response['response']['code'] ) === 200 && isset( $response['body'] ) && trim( $response['body'] ) !== '' ) {
 						$body = json_decode( $response['body'] );
@@ -1813,7 +1879,7 @@ final class WC_IfthenPay_Webdados {
 							} else {
 								$debug_msg       = '- Error: ' . trim( $body->Message ) . ' - Order ' . $order->get_id();
 								$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-								$this->debug_log( $this->multibanco_id, $debug_msg, 'error', true, $debug_msg_email );
+								$this->debug_log( $this->multibanco_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 								if ( $throw_exception ) {
 									throw new Exception(
 										sprintf(
@@ -1828,7 +1894,7 @@ final class WC_IfthenPay_Webdados {
 						} else {
 							$debug_msg       = '- Response body is not JSON - Order ' . $order->get_id();
 							$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-							$this->debug_log( $this->multibanco_id, $debug_msg, 'error', true, $debug_msg_email );
+							$this->debug_log( $this->multibanco_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 							if ( $throw_exception ) {
 								throw new Exception(
 									sprintf(
@@ -1843,7 +1909,7 @@ final class WC_IfthenPay_Webdados {
 					} else {
 						$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Incorrect response code: ' . $response['response']['code'];
 						$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-						$this->debug_log( $this->multibanco_id, $debug_msg, 'error', true, $debug_msg_email );
+						$this->debug_log( $this->multibanco_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 						if ( $throw_exception ) {
 							throw new Exception(
 								sprintf(
@@ -2193,7 +2259,7 @@ final class WC_IfthenPay_Webdados {
 				} else {
 					$debug_msg       = '- Error: ' . trim( $body->Status ) . ' ' . trim( $body->Message ) . ' - Order ' . $order->get_id();
 					$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-					$this->debug_log( $this->mbway_id, $debug_msg, 'error', true, $debug_msg_email );
+					$this->debug_log( $this->mbway_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 					if ( $throw_exception ) {
 						throw new Exception(
 							sprintf(
@@ -2216,7 +2282,7 @@ final class WC_IfthenPay_Webdados {
 			} else {
 				$debug_msg       = '- Response body is not JSON - Order ' . $order->get_id();
 				$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-				$this->debug_log( $this->mbway_id, $debug_msg, 'error', true, $debug_msg_email );
+				$this->debug_log( $this->mbway_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 				if ( $throw_exception ) {
 					throw new Exception(
 						sprintf(
@@ -2231,7 +2297,7 @@ final class WC_IfthenPay_Webdados {
 		} else {
 			$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Incorrect response code: ' . $response['response']['code'];
 			$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
-			$this->debug_log( $this->mbway_id, $debug_msg, 'error', true, $debug_msg_email );
+			$this->debug_log( $this->mbway_id, $debug_msg, 'error', $debug_email, $debug_msg_email );
 			if ( $throw_exception ) {
 				throw new Exception(
 					sprintf(
@@ -3650,6 +3716,31 @@ final class WC_IfthenPay_Webdados {
 	}
 
 	/**
+	 * Get gateway title or description for blocks checkout
+	 *
+	 * Retrieves the payment gateway title or description that is properly translated
+	 * when WPML is active. This helps ensure consistent payment method display
+	 * across different languages in WooCommerce Blocks checkout.
+	 *
+	 * @param string $gateway_id       The payment gateway ID.
+	 * @param array  $gateway_settings The gateway settings array containing titles and descriptions.
+	 * @param string $field           The gateway field to get: 'title' or 'description'.
+	 * @return string The translated title or description, or original if WPML is not active.
+	 */
+	public function get_gateway_title_or_description_for_blocks( $gateway_id, $gateway_settings, $field ) {
+		if ( $this->wpml_active ) {
+			$gateway_title_or_description = apply_filters(
+				'wpml_translate_single_string',
+				$gateway_settings[ $field ],
+				'admin_texts_woocommerce_gateways',
+				$gateway_id . '_gateway_' . $field
+			);
+			return trim( $gateway_title_or_description );
+		}
+		return $gateway_settings[ $field ];
+	}
+
+	/**
 	 * Filter notify URLs
 	 */
 	public function filter_notify_urls() {
@@ -3991,5 +4082,14 @@ final class WC_IfthenPay_Webdados {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Action scheduler task that does nothing
+	 *
+	 * Used to keep the Action Scheduler running and not looping
+	 */
+	public function action_scheduler_do_nothing() {
+		// Do nothing - Make sure the task does not fail for lack of a hook
 	}
 }

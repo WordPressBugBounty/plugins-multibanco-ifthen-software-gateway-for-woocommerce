@@ -60,6 +60,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 
 			$this->has_fields = true;
 
+			// Title, description and icon
 			$this->method_title       = __( 'MB WAY mobile payment', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' (ifthenpay)';
 			$this->method_description = __( 'Easy and simple payment using “MB WAY” on your mobile phone. (Only available for customers of Portuguese banks with MB WAY app installed - Payment service provided by ifthenpay)', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 			if ( WC_IfthenPay_Webdados()->wc_subscriptions_active && $this->get_option( 'support_woocommerce_subscriptions' ) === 'yes' ) { // Deprecated on version 6.5
@@ -72,6 +73,9 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 					'subscription_payment_method_change_admin', // Deprecated?
 				); // products is by default
 			}
+			$this->icon = WC_IfthenPay_Webdados()->mbway_icon;
+
+			// Secret key
 			$this->secret_key = $this->get_option( 'secret_key' );
 			if ( trim( $this->secret_key ) === '' ) {
 				// First load?
@@ -171,16 +175,17 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 		 * Upgrades (if needed)
 		 */
 		private function upgrade() {
-			if ( version_compare( $this->get_option( 'version' ), $this->version, '<' ) ) {
+			$db_version = $this->get_option( 'version' );
+			if ( version_compare( $db_version, $this->version, '<' ) ) {
 				$current_options = get_option( 'woocommerce_' . $this->id . '_settings', '' );
 				if ( ! is_array( $current_options ) ) {
 					$current_options = array();
 				}
 				// Upgrade
-				$this->debug_log( 'Upgrade to ' . $this->version . ' started' );
+				$this->debug_log( 'Upgrade from ' . $db_version . ' to ' . $this->version . ' started' );
 				// Specific versions upgrades should be here
 				// Update routines when upgrading to 11.0.1 or above - Fix some autoloaded options
-				if ( version_compare( $this->get_option( 'version' ), '11.0.1', '<' ) ) {
+				if ( version_compare( $db_version, '11.0.1', '<' ) ) {
 					$value = get_option( $this->id . '_callback_email_sent' );
 					delete_option( $this->id . '_callback_email_sent' );
 					update_option( $this->id . '_callback_email_sent', $value, false );
@@ -188,7 +193,7 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 				// Upgrade on the database - Risky?
 				$current_options['version'] = $this->version;
 				update_option( 'woocommerce_' . $this->id . '_settings', $current_options );
-				$this->debug_log( 'Upgrade to ' . $this->version . ' finished' );
+				$this->debug_log( 'Upgrade from ' . $db_version . ' to ' . $this->version . ' finished' );
 			}
 		}
 
@@ -583,8 +588,8 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 								</tr>
 								<tr valign="top">
 									<th scope="row" class="titledesc"><?php esc_html_e( 'Callback URL', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></th>
-									<td class="forminp">
-										<?php echo esc_url( WC_IfthenPay_Webdados()->mbway_notify_url ); ?>
+									<td class="forminp callbackurl">
+										<?php echo esc_html( WC_IfthenPay_Webdados()->mbway_notify_url ); ?>
 									</td>
 								</tr>
 							</table>
@@ -595,8 +600,6 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 								<input type="hidden" id="wc_ifthen_callback_send" name="wc_ifthen_callback_send" value="0"/>
 								<input type="hidden" id="wc_ifthen_callback_bo_key" name="wc_ifthen_callback_bo_key" value=""/>
 								<button id="wc_ifthen_callback_submit_webservice" class="button-primary" type="button"><?php esc_html_e( 'Ask for Callback activation', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?> - <?php esc_html_e( 'Via API (recommended)', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></button>
-								<br/><br/>
-								<button id="wc_ifthen_callback_submit" class="button" type="button"><?php esc_html_e( 'Ask for Callback activation', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?> - <?php esc_html_e( 'Via email (old method)', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></button>
 								<input id="wc_ifthen_callback_cancel" class="button" type="button" value="<?php esc_html_e( 'Cancel', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>"/>
 								<input type="hidden" name="save" value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>"/> <!-- Force action woocommerce_update_options_payment_gateways_ to run, from WooCommerce 3.5.5 --> <?php //phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?>
 							</p>
@@ -688,33 +691,6 @@ if ( ! class_exists( 'WC_MBWAY_IfThen_Webdados' ) ) {
 						. ' - ' .
 						$result['message']
 					);
-				}
-			} elseif ( $callback_send === 1 ) {
-				// Email
-				$to      = WC_IfthenPay_Webdados()->callback_email;
-				$cc      = get_option( 'admin_email' );
-				$subject = 'Activação de Callback MB WAY (Key: ' . $this->mbwaykey . ')';
-				$message = 'Por favor activar Callback MB WAY com os seguintes dados:
-
-MB WAY Key:
-' . $this->mbwaykey . '
-
-Chave anti-phishing (MB WAY):
-' . $this->secret_key . '
-
-URL:
-' . WC_IfthenPay_Webdados()->mbway_notify_url . '
-
-Email enviado automaticamente do plugin WordPress “ifthenpay for WooCommerce” ' . $to . ' com CC para ' . $cc;
-				$headers = array(
-					'From: ' . get_option( 'admin_email' ) . ' <' . get_option( 'admin_email' ) . '>',
-					'Cc: ' . $cc,
-				);
-				if ( wp_mail( $to, $subject, $message, $headers ) ) {
-					update_option( $this->id . '_callback_email_sent', 'yes', false );
-					WC_Admin_Settings::add_message( __( 'The “Callback” activation request has been submited to ifthenpay. Wait for their feedback.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
-				} else {
-					WC_Admin_Settings::add_error( __( 'The “Callback” activation request could not be sent. Check if your WordPress install can send emails.', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
 				}
 			}
 		}
@@ -1312,6 +1288,7 @@ Email enviado automaticamente do plugin WordPress “ifthenpay for WooCommerce�
 					gap: 0.75em;
 					align-items: center;
 					margin-top: 0.5em;
+					clear: both;
 				}
 				#<?php echo esc_html( $this->id ); ?>_phone_field_container_country_code {
 					display: inline-block;
@@ -1323,7 +1300,7 @@ Email enviado automaticamente do plugin WordPress “ifthenpay for WooCommerce�
 				#<?php echo esc_html( $this->id ); ?>_phone_field_container #<?php echo esc_html( $this->id ); ?>_phone {
 					width: 50%;
 				}
-				@container phone-field ( max-width: 400px ) {
+				@container phone-field ( max-width: <?php echo esc_html( apply_filters( 'mbway_ifthen_checkout_phone_field_max_width_break_fields', '400px' ) ); ?> ) {
 					#<?php echo esc_html( $this->id ); ?>_phone_field_container {
 						flex-direction: column;
 					}
@@ -1445,12 +1422,20 @@ Email enviado automaticamente do plugin WordPress “ifthenpay for WooCommerce�
 			) {
 				// Let's process it
 				$this->debug_log( '- Callback (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with all arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
-				$referencia      = trim( sanitize_text_field( wp_unslash( $_GET['referencia'] ) ) );
-				$id_pedido       = str_replace( ' ', '+', trim( sanitize_text_field( wp_unslash( $_GET['idpedido'] ) ) ) ); // If there's a plus sign on the URL We'll get it as a space, so we need to get it back
-				$val             = floatval( $_GET['valor'] );
-				$estado          = trim( sanitize_text_field( wp_unslash( $_GET['estado'] ) ) );
-				$chave           = trim( sanitize_text_field( wp_unslash( $_GET['chave'] ) ) );
-				$datahorapag     = isset( $_GET['datahorapag'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['datahorapag'] ) ) ) : '';
+				$referencia  = trim( sanitize_text_field( wp_unslash( $_GET['referencia'] ) ) );
+				$id_pedido   = str_replace( ' ', '+', trim( sanitize_text_field( wp_unslash( $_GET['idpedido'] ) ) ) ); // If there's a plus sign on the URL We'll get it as a space, so we need to get it back
+				$val         = floatval( $_GET['valor'] );
+				$estado      = trim( sanitize_text_field( wp_unslash( $_GET['estado'] ) ) );
+				$chave       = trim( sanitize_text_field( wp_unslash( $_GET['chave'] ) ) );
+				$datahorapag = isset( $_GET['datahorapag'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['datahorapag'] ) ) ) : '';
+				// Fix datahorapag from dd-mm-yyyyhh:ii:ss to yyyy-mm-dd hh:ii:ss
+				$datahorapag = str_replace( ' ', '', $datahorapag );
+				$datahorapag = str_replace( '%20', '', $datahorapag );
+				if ( strlen( $datahorapag ) === 18 ) {
+					$data_temp   = implode( '-', array_reverse( explode( '-', substr( $datahorapag, 0, 10 ) ) ) );
+					$hora_tempo  = substr( $datahorapag, 10 );
+					$datahorapag = $data_temp . ' ' . $hora_tempo;
+				}
 				$arguments_ok    = true;
 				$arguments_error = '';
 				if ( $chave !== trim( $this->secret_key ) ) {

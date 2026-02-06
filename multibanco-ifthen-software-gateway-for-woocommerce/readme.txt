@@ -1,10 +1,10 @@
 === Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce ===
 Contributors: nakedcatplugins, webdados, ifthenpay
-Tags: multibanco, mbway, payshop, card, cofidis
+Tags: ifthenpay, ecommerce, portugal, atm, homebanking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 11.1.0
+Stable tag: 11.3.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,10 +12,10 @@ Secure WooCommerce payments with Multibanco, MB WAY, Credit card, Apple Pay, Goo
 
 == Description ==
 
-“Pagamento de Serviços” (payment of services) on Multibanco (Portuguese ATM network), and MB WAY (using the customer’s mobile phone number), are the most popular way to pay for services and (online) purchases in Portugal.
+“Pagamento de Serviços” (payment of services) on Multibanco (Portuguese ATM network), and MB WAY (using the customer’s mobile phone number), are the most popular ways to pay for services and (online) purchases in Portugal.
 Portuguese consumers trust the “Multibanco” and “MB WAY” payment methods more than any other.
 
-This plugin will generate a “Multibanco” payment Reference the customer can then use to pay for his WooCommerce order, through an ATM or homebanking service, or an “MB WAY” payment request which will send a push notification to the customer’s mobile phone for payment approval.
+This plugin generates a “Multibanco” Payment Reference that customers can use to pay for their WooCommerce orders at an ATM or via home banking, or an “MB WAY” payment request which will send a push notification to the customer’s mobile phone for payment approval.
 
 Credit or debit cards, including Apple Pay and Google Pay, CTT Payshop, and Cofidis Pay payment methods are also available.
 
@@ -27,14 +27,14 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 
 = Features: =
 
-* Generates a Multibanco Reference for simple payment on the Portuguese ATM network or homebanking service;
-* Allows the customer to pay using MB WAY using his mobile phone;
-* Allows the customer to pay using his Credit or debit card, including Apple Pay and Google Pay;
+* Generates a Multibanco Reference for simple payment on the Portuguese ATM network or home banking service;
+* Allows the customer to pay using MB WAY using their mobile phone;
+* Allows the customer to pay using their Credit or debit card, including Apple Pay and Google Pay;
 * Generates a Payshop Reference for simple payment on the [Payshop agents network](https://www.payshop.pt/fepsapl/app/open/showSearchAgent.jspx), CTT stores or post offices available all over Portugal;
 * Allows the customer to pay in up to 12 interest-free installments via Cofidis Pay;
 * Customers with Brazilian bank accounts can use PIX;
 * Multibanco references with expiration date if the “MB Key” configuration method is used;
-* Automatically changes the order status to “Processing” (or “Completed” if the order only contains virtual downloadable products) and notifies both the customer and the store owner, if the automatic “Callback” upon payment is activated;
+* Automatically changes the order status to “Processing” (or “Completed” if the order only contains virtual downloadable products) and notifies both the customer and the store owner if the automatic “Callback” upon payment is activated;
 * Automatic “Callback” can be activated upon request to ifthenpay, via the plugin settings screen for each payment method;
 * Refunds for MB WAY and Credit or debit card - [read this](https://helpdesk.ifthenpay.com/pt-PT/support/solutions/articles/79000130517-devoluc%C3%B5es-de-pagamentos-aos-ordenantes);
 * Shop owner can set minimum and maximum order totals for each payment gateway to be available;
@@ -57,7 +57,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 
 Get the [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) and unlock extra features:
 
-* Recover unpaid MB WAY orders by converting them to Multibanco and notify the customer via email;
+* Recover unpaid MB WAY orders by converting them to Multibanco and notifying the customer via email;
 * Automatic cancellation of orders when Multibanco, Payshop, or MB WAY references expire;
 * Countdown timer on the “Thank you” page for MB WAY payments;
 * Save the MB WAY mobile number to the user profile for future purchases;
@@ -75,7 +75,7 @@ Get the [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit
 * Hide notices of pending callback activation requests;
 * Hide sidebar in payment method settings screen;
 * More features coming soon;
-* By purchasing the PRO add-on you get the following:
+* By purchasing the PRO add-on, you get the following:
 	* All the features described above;
 	* Premium technical support (conditions apply);
 	* Contribution to the continued development of the solution;
@@ -108,25 +108,25 @@ Already know our other WooCommerce (premium) plugins?
 * Payshop: Go to WooCommerce > Settings > Checkout > Pagamento na rede de agentes Payshop and fill in the data provided by ifthenpay: Payshop Key.
 * Cofidis Pay: Go to WooCommerce > Settings > Checkout > Cofidis Pay and fill in the data provided by ifthenpay: Cofidis Pay Key.
 * Apple Pay, Google Pay, and PIX: Go to WooCommerce > Settings > Checkout > ifthenpay Gateway and fill in the data provided by ifthenpay: Backoffice Key, then choose the Gateway Key (request a new “Static gateway” if you don’t have one already), and finally, the Payment methods you want to activate.
-* Make sure you ask ifthenpay to activate the “Callback” on their side with the URL and Anti-phishing key provided in the settings screen. There is a feature in each payment method screen that allows you to make this request via an API, except on Credit card where this is not needed, and payment methods via “ifthenpay Gateway” (Apple Pay, Google Pay, and PIX) where the callback activation is automatically set.
+* Make sure you ask ifthenpay to activate the “Callback” on their side with the URL and Anti-phishing key provided in the settings screen. There is a feature on each payment method screen that allows you to make this request via an API, except for payment methods via the “ifthenpay Gateway” (Apple Pay, Google Pay, and PIX), where the callback activation is automatically set.
 * Start receiving payments :-)
 
 == Frequently Asked Questions ==
 
 = Can I start receiving payments right away? Show me the money! =
 
-You have to sign a contract with ifthenpay in order to activate this service. Go to [https://ifthenpay.com](https://ifthenpay.com) for more information.
+You have to sign a contract with ifthenpay to activate this service. Go to [ifthenpay.com](https://ifthenpay.com/?lang=en) for more information and to sign up.
 
 = I’m an individual and not a registered business. Can I use this plugin? =
 
-ifthenpay only provides this service to registered businesses and equivalents (like tax-registered freelancers, for example).
+ifthenpay only provides this service to registered businesses and equivalents (such as tax-registered freelancers).
 You should [contact ifthenpay](https://ifthenpay.com/#contactos) if you need additional details on this matter.
 
 = The generated Multibanco reference does not contain the order number. How do I know which order was paid? =
 
-ifthenpay will send you an email each time a reference is paid, but the reference does not contain the order number. By design, our plugin does not include the order number in the reference due to the way WooCommerce/WordPress sets orders/posts IDs.
-Anyway, you do not need the order number in the reference, because our plugin uses a callback mechanism. ifthenpay automatically notifies WooCommerce when a specific Multibanco reference is used for payment. The order is linked to the reference in the database and, also automatically, will be set as paid.
-If you still need to know to which order a reference is linked to, use the search box in the WooCommerce Orders administration screen.
+ifthenpay will send you an email each time a reference is paid, but the reference does not contain the order number. By design, our plugin does not include the order number in the reference because of the way WooCommerce/WordPress sets orders/posts IDs.
+Anyway, you do not need the order number in the reference, because our plugin uses a callback mechanism. ifthenpay automatically notifies WooCommerce when a specific Multibanco reference is used for payment. The order is linked to the reference in the database and will also be automatically set as paid.
+If you still need to know which order a reference is linked to, use the search box on the WooCommerce Orders administration screen.
 
 = How do I test the callback call to simulate a payment and foresee what happens when a real payment is made by a customer? =
 
@@ -140,16 +140,16 @@ Don’t forget to set `WP_DEBUG` to `false` again, as it should not be active on
 Just like in any other WooCommerce payment gateway that supports refunds.
 Check out the instructions carefully [here (Automatic refunds, step 4)](https://woocommerce.com/document/woocommerce-refunds/) and [here (WooCommerce specific instructions)](https://helpdesk.ifthenpay.com/pt-PT/support/solutions/articles/79000130517-devoluc%C3%B5es-de-pagamentos-aos-ordenantes).
 
-= Can I use this plugin, and the ifthenpay service, on more than one website? =
+= Can I use this plugin and the ifthenpay service on more than one website? =
 
 Yes, but not with the same payment method keys.
 Ask ifthenpay for different credentials for each website, and payment method, you need the service to be available.
-There is no extra costs involved, and you can even route payments to distinct bank accounts.
+There are no extra costs, and you can even route payments to separate bank accounts.
 
-= Can I change the payment instructions look and feel in the “Thank you” page and/or the new order email, as well as the SMS message format? =
+= Can I change the look and feel of the payment instructions on the “Thank you” page and/or the new order email, as well as the SMS message format? =
 
 Yes, you can, but you should know your way around WordPress filters.
-There are filters to do this and you can find examples within `hooks-examples.php`.
+There are filters for this, and you can find examples in `hooks-examples.php`.
 
 = Can I change the payment gateway icon on the checkout page? =
 
@@ -167,8 +167,8 @@ The MB WAY payment requests expire after 4 minutes.
 = Why doesn’t the customer receive an email when paying with MB WAY, Credit card, Apple Pay, Google Pay, or PIX? =
 
 These payments need to be approved immediately after checking out.
-WooCommerce only sends payment instruction emails for payment methods that require later, and not immediate payment, like Multibanco, Payshop, and Bank transfer, for example.
-The customer will still get an email, if properly configured on WooCommerce, upon payment (just not before).
+WooCommerce only sends payment instruction emails for payment methods that require later payment, not immediate payment, like Multibanco, Payshop, and Bank transfer, for example.
+The customer will still receive an email upon payment if properly configured in WooCommerce (just not before).
 
 = Do Apple Pay and Google Pay support Express Checkout? =
 
@@ -235,7 +235,7 @@ Yes. This plugin is fully compatible with HPOS since December 2022.
 
 = Is this plugin compatible with the WooCommerce Cart and Checkout Blocks? =
 
-Yes. This plugin is compatible with HPOS since August 2020.
+Yes. This plugin is compatible with the Block-Based Checkout since August 2020.
 
 = I need technical support. Who should I contact, ifthenpay or Webdados? =
 
@@ -254,6 +254,33 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 11.3.2 - 2026-01-21 =
+* [FIX] Add an empty function to the `wc_ifthen_hourly_cron` scheduled action to avoid loop issues on Action Scheduler, introduced on 11.3.0, and clear its failed logs (Thanks BestSites.pt for reporting)
+* [DEV] Move global upgrade routines from the Multibanco to the main plugin class
+
+= 11.3.1 - 2026-01-15 =
+* [DEV] Remove unnecessary development folders from the repository
+
+= 11.3.0 - 2026-01-14 =
+* [DEV] New `mbway_ifthen_checkout_phone_field_max_width_break_fields` filter to override the container maximum width after which the MB WAY classic checkout fields country code and phone number show up in separate lines, instead of side by side. Default: `400px`
+* [DEV] Replace hourly WP cron with Action Scheduler
+* [TWEAK] Normalize MB WAY payment date/time received on the callback to ISO format
+* [FIX] Callback URL output on the callback activation section on each payment method
+* [DEV] Tested with 7.0-alpha-61480 and WooCommerce 10.4.3
+
+= 11.2.1 - 2025-10-30 =
+* [FIX] Debug errors to email when requesting Multibanco or MB Way payments to ifthenpay
+* [TWEAK] Small readme.txt adjustments
+* [TWEAK] Replace “homebanking” with “home banking”
+* [DEV] Tested with WordPress 6.9-beta2-61087 and WooCommerce 10.3.3
+
+= 11.2.0 - 2025-10-20 =
+* [TWEAK] Display payment method icons on the backend
+* [TWEAK] Better UX on the country code and phone number fields on the blocks checkout
+* [TWEAK] Remove old method of callback activation via email
+* [FIX] Display correct translated payment gateway title and description on the blocks checkout if WPML is active
+* [DEV] Tested with WordPress 6.9-alpha-60939 and WooCommerce 10.3.0-rc.1
 
 = 11.1.0 - 2025-09-22 =
 * [DEV] Change some remaining `wc_get_orders` calls to our internal wrapper

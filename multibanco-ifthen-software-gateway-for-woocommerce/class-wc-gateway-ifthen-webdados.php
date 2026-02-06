@@ -61,8 +61,10 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 
 			$this->has_fields = false;
 
+			// Title, description and icon
 			$this->method_title       = __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 			$this->method_description = __( 'Easy and simple payment using Apple Pay, Google Pay, or PIX. (Via the ifthenpay Gateway)', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+			$this->icon               = WC_IfthenPay_Webdados()->gateway_ifthen_icon;
 
 			// Anti-phishing key
 			$this->secret_key = $this->get_option( 'secret_key' );
@@ -178,18 +180,19 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 		 * Upgrades (if needed)
 		 */
 		private function upgrade() {
-			if ( version_compare( $this->get_option( 'version' ), $this->version, '<' ) ) {
+			$db_version = $this->get_option( 'version' );
+			if ( version_compare( $db_version, $this->version, '<' ) ) {
 				$current_options = get_option( 'woocommerce_' . $this->id . '_settings', '' );
 				if ( ! is_array( $current_options ) ) {
 					$current_options = array();
 				}
 				// Upgrade
-				$this->debug_log( 'Upgrade to ' . $this->version . ' started' );
+				$this->debug_log( 'Upgrade from ' . $db_version . ' to ' . $this->version . ' started' );
 				// Specific versions upgrades should be here
 				// Upgrade on the database - Risky?
 				$current_options['version'] = $this->version;
 				update_option( 'woocommerce_' . $this->id . '_settings', $current_options );
-				$this->debug_log( 'Upgrade to ' . $this->version . ' finished' );
+				$this->debug_log( 'Upgrade from ' . $db_version . ' to ' . $this->version . ' finished' );
 			}
 		}
 

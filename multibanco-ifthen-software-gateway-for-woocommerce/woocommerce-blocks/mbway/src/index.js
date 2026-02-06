@@ -194,9 +194,52 @@ const Content = ( props ) => {
 
 	// Extend after phone number
 	var afterPhoneNumber = applyFilters( 'mbway_ifthen_blocks_checkout_after_phone_number', null );
+	
+	// CSS
+	if ( countrycode ) {
+		var inlineStyles = `
+			.mbway-ifthen-for-woocommerce-instructions-container {
+				container-type: inline-size;
+				container-name: mbway-ifthen-instructions-container;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0 16px;
+				justify-content: space-between;
+
+			}
+			.mbway-ifthen-for-woocommerce-instructions-container > * {
+				flex: 0 0 100%;
+			}
+			.mbway-ifthen-for-woocommerce-instructions-container > :nth-child(2) { /* instructions */
+				margin-bottom: 0px;
+			}
+			@container mbway-ifthen-instructions-container ( min-width: 450px ) {
+				.mbway-ifthen-for-woocommerce-instructions-container > :nth-child(3), /* country code */
+				.mbway-ifthen-for-woocommerce-instructions-container > :nth-child(4) { /* phone number */
+					box-sizing: border-box;
+					flex: 1 0 calc( 50% - 12px );
+				}
+			}
+		`;
+	} else {
+		var inlineStyles = ``;
+	}
+	// Add a style tag to your component
+	const styleTag = React.createElement( 'style', null, inlineStyles );
 
 	// Return Content
-	return React.createElement( 'div', null, description, beforePhoneNumber, countrycode, phonenumber, afterPhoneNumber );
+	return React.createElement(
+		'div',
+		{
+			className: 'mbway-ifthen-for-woocommerce-instructions-container'
+		},
+		styleTag,
+		description,
+		beforePhoneNumber,
+		countrycode,
+		phonenumber,
+		afterPhoneNumber
+	);
 };
 
 /**
