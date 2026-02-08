@@ -1150,7 +1150,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 			<p style="text-align: center; margin: auto; margin-top: 1em; margin-bottom: 1em; padding-top: 1em; padding-bottom: 1em;" id="ifthenpay_payment_received">
 				<img src="<?php echo esc_url( WC_IfthenPay_Webdados()->multibanco_banner_email ); ?>" alt="<?php echo esc_attr( $alt ); ?>" title="<?php echo esc_attr( $alt ); ?>" style="margin: auto; margin-top: 10px; max-height: 48px;"/>
 				<br/>
-				<strong><?php esc_html_e( 'Multibanco payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></strong>
+				<strong><?php esc_html_e( 'ifthenpay Multibanco payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></strong>
 			</p>
 			<?php
 			return apply_filters( 'multibanco_ifthen_email_instructions_payment_received', ob_get_clean(), $order_id );
@@ -1188,6 +1188,8 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 		 * @param  int $order_id Order ID.
 		 */
 		public function process_payment( $order_id ) {
+
+			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
 
 			$order = wc_get_order( $order_id );
 			do_action( 'multibanco_ifthen_before_process_payment', $order );
@@ -1263,7 +1265,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 			// Mark as on-hold
 			if ( $order->get_total() > 0 ) {
 				// If it's the blocks checkout, we should create the reference before changing the status
-				if ( stristr( WC_IfthenPay_Webdados()->get_request_uri(), 'wp-json/wc/store' ) ) {
+				if ( stristr( $server_request_uri, 'wp-json/wc/store' ) ) {
 					WC_IfthenPay_Webdados()->multibanco_woocommerce_checkout_update_order_meta( $order->get_id() );
 				}
 				if ( apply_filters( 'multibanco_ifthen_set_on_hold', true, $order->get_id() ) ) {
@@ -1389,6 +1391,10 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 		 */
 		public function callback() {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			$server_http_host   = WC_IfthenPay_Webdados()->get_http_host();
+			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
+			$server_remote_addr = WC_IfthenPay_Webdados()->get_remote_addr();
+
 			@ob_clean(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			// We must 1st check the situation and then process it and send email to the store owner in case of error.
 			if (
@@ -1401,7 +1407,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 				isset( $_GET['valor'] )
 			) {
 				// Let's process it
-				$this->debug_log( '- Callback (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with all arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+				$this->debug_log( '- Callback (' . $server_request_uri . ') with all arguments from ' . $server_remote_addr );
 				$ref             = trim( str_replace( ' ', '', sanitize_text_field( wp_unslash( $_GET['referencia'] ) ) ) );
 				$ent             = trim( sanitize_text_field( wp_unslash( $_GET['entidade'] ) ) );
 				$val             = floatval( $_GET['valor'] );
@@ -1409,7 +1415,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 				$arguments_error = '';
 				if ( trim( sanitize_text_field( wp_unslash( $_GET['chave'] ) ) ) !== trim( $this->secret_key ) ) {
 					$arguments_ok     = false;
-					$arguments_error .= ' - Key';
+					$arguments_error .= ' - Anti-phishing key';
 				}
 				if ( ! is_numeric( $ref ) ) {
 					$arguments_ok     = false;
@@ -1455,7 +1461,7 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 					if ( $orders_exist ) {
 						if ( $orders_count === 1 ) {
 							if ( floatval( $val ) === floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ) ) ) {
-								$note = __( 'Multibanco payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+								$note = __( 'ifthenpay Multibanco payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 								if ( isset( $_GET['datahorapag'] ) && trim( sanitize_text_field( wp_unslash( $_GET['datahorapag'] ) ) ) !== '' ) {
 									$note .= ' ' . trim( sanitize_text_field( wp_unslash( $_GET['datahorapag'] ) ) );
 								}
@@ -1495,33 +1501,43 @@ if ( ! class_exists( 'WC_Multibanco_IfThen_Webdados' ) ) {
 							} else {
 								header( 'HTTP/1.1 200 OK' );
 								$err = 'Error: The value does not match';
-								$this->debug_log( '-- ' . $err . ' - Order ' . $order->get_id(), 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+								$this->debug_log( '-- ' . $err . ' - Order ' . $order->get_id(), 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 								echo esc_html( $err );
 								do_action( 'multibanco_ifthen_callback_payment_failed', $order->get_id(), $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 							}
 						} else {
 							header( 'HTTP/1.1 200 OK' );
 							$err = 'Error: More than 1 order found awaiting payment with these details';
-							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 							echo esc_html( $err );
 							do_action( 'multibanco_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						}
 					} else {
 						header( 'HTTP/1.1 200 OK' );
-						$err = 'Error: No orders found awaiting payment with these details';
-						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+						$err = WC_IfthenPay_Webdados()->callback_helper_order_not_found_error( $this->id, $args, 'Multibanco' );
+						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 						echo esc_html( $err );
 						do_action( 'multibanco_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					}
 				} else {
 					$err = 'Argument errors';
-					$this->debug_log( '-- ' . $err . $arguments_error, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') with argument errors from ' . WC_IfthenPay_Webdados()->get_remote_addr() . $arguments_error );
+					$this->debug_log(
+						'-- ' . $err . $arguments_error,
+						'warning',
+						true,
+						'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error . ' - GET: ' . wp_json_encode( $_GET )
+					);
 					do_action( 'multibanco_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					wp_die( esc_html( $err ), 'WC_Multibanco_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 				}
 			} else {
-				$err = 'Callback (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with missing arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr();
-				$this->debug_log( '- ' . $err, 'warning', true );
+				$err = 'Callback (' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr;
+				$this->debug_log(
+					'- ' . $err,
+					'warning',
+					true,
+					'GET: ' . wp_json_encode( $_GET )
+				);
 				do_action( 'multibanco_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				wp_die( 'Error: Something is missing...', 'WC_Multibanco_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 			}

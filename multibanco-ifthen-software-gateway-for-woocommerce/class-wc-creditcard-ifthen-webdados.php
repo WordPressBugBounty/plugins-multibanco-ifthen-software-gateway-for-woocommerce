@@ -755,7 +755,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 			<p style="text-align: center; margin: auto; margin-top: 1em; margin-bottom: 1em; padding-top: 1em; padding-bottom: 1em;" id="ifthenpay_payment_received">
 				<img src="<?php echo esc_url( WC_IfthenPay_Webdados()->creditcard_banner_email ); ?>" alt="<?php echo esc_attr( $alt ); ?>" title="<?php echo esc_attr( $alt ); ?>" style="margin: auto; margin-top: 10px; max-height: 48px;"/>
 				<br/>
-				<strong><?php esc_html_e( 'Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></strong>
+				<strong><?php esc_html_e( 'ifthenpay Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></strong>
 			</p>
 			<?php
 			return apply_filters( 'creditcard_ifthen_email_instructions_payment_received', ob_get_clean(), $order_id );
@@ -950,9 +950,12 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 		 */
 		public function return_payment_gateway() {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
-			$redirect_url = '';
-			$error        = false;
-			$order_id     = 0;
+			$redirect_url       = '';
+			$error              = false;
+			$order_id           = 0;
+			$server_http_host   = WC_IfthenPay_Webdados()->get_http_host();
+			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
+			$server_remote_addr = WC_IfthenPay_Webdados()->get_remote_addr();
 
 			if (
 				isset( $_GET['status'] )
@@ -963,7 +966,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 				&&
 				isset( $_GET['requestId'] )
 			) {
-				$this->debug_log( '- Return from gateway (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with all arguments' );
+				$this->debug_log( '- Return from gateway (' . $server_request_uri . ') with all arguments' );
 				$request_id = trim( sanitize_text_field( wp_unslash( $_GET['requestId'] ) ) );
 				$id         = trim( sanitize_text_field( wp_unslash( $_GET['id'] ) ) );
 				$val        = trim( sanitize_text_field( wp_unslash( $_GET['amount'] ) ) ); // Não fazemos float porque 7.40 passaria a 7.4 e depois não validava a hash
@@ -982,7 +985,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 							$hash          = hash_hmac( 'sha256', $id . $val . $request_id, $order_details['creditcardkey'] );
 							if ( $sk === $hash ) {
 								$this->debug_log_extra( 'Order found: ' . $order->get_id() . ' - Hash ok' );
-								$note = __( 'Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+								$note = __( 'ifthenpay Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 								// WooCommerce Deposits second payment?
 								if ( WC_IfthenPay_Webdados()->wc_deposits_active ) {
 									if ( $order->get_meta( '_wc_deposits_order_has_deposit' ) === 'yes' ) { // Has deposit
@@ -1002,7 +1005,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 								$this->payment_complete( $order, '', $note );
 								do_action( 'creditcard_ifthen_callback_payment_complete', $order->get_id(), $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 								$debug_order = wc_get_order( $order->get_id() );
-								$this->debug_log( '-- Credit card payment received - Order ' . $order->get_id(), 'notice' );
+								$this->debug_log( '-- Credit card payment received - Order ' . $order->get_id(), 'notice', false, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 								$this->debug_log_extra( 'payment_complete - Redirect to thank you page: ' . $url . ' - Order ' . $order->get_id() . ' - Status: ' . $debug_order->get_status() );
 								wp_safe_redirect( $url );
 								exit;
@@ -1081,7 +1084,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 
 				}
 			} else {
-				$error = 'Return from gateway (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with missing arguments';
+				$error = 'Return from gateway (' . $server_request_uri . ') with missing arguments';
 			}
 
 			// Error and redirect
@@ -1126,7 +1129,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 				$arguments_error = '';
 				if ( trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) !== trim( $this->secret_key ) ) {
 					$arguments_ok     = false;
-					$arguments_error .= ' - Key';
+					$arguments_error .= ' - Anti-phishing key';
 				}
 				if ( trim( $id ) === '' ) { // If using ifthen_webservice_send_order_number_instead_id, this can be a non-numeric value
 					$arguments_ok     = false;
@@ -1149,7 +1152,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 						$get_order = $this->callback_helper_get_pending_order( $request_id, $id, $val );
 						if ( $get_order['success'] && $get_order['order'] ) {
 							$order = $get_order['order'];
-							$note  = __( 'Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+							$note  = __( 'ifthenpay Credit or debit card payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 							if ( isset( $_GET['payment_datetime'] ) ) {
 								$note .= ' ' . trim( sanitize_text_field( wp_unslash( $_GET['payment_datetime'] ) ) );
 							}
@@ -1258,7 +1261,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 							if ( ! isset( $err ) ) {
 								$err = 'Error: No unprocessed refunds found with these details';
 							}
-							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() . ' - No refunds found with these details' );
+							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - No refunds found with these details' );
 							echo esc_html( $err );
 							do_action( 'creditcard_ifthen_callback_refund_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						}
@@ -1272,13 +1275,23 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 					}
 				} else {
 					$err = 'Argument errors';
-					$this->debug_log( '-- ' . $err . $arguments_error, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error );
+					$this->debug_log(
+						'-- ' . $err . $arguments_error,
+						'warning',
+						true,
+						'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error . ' - GET: ' . wp_json_encode( $_GET )
+					);
 					do_action( 'creditcard_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					wp_die( esc_html( $err ), 'WC_Gateway_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 				}
 			} else {
 				$err = 'Callback (' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr;
-				$this->debug_log( '- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr );
+				$this->debug_log(
+					'- ' . $err,
+					'warning',
+					true,
+					'GET: ' . wp_json_encode( $_GET )
+				);
 				do_action( 'creditcard_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				wp_die( 'Error: Something is missing...', 'WC_Gateway_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 			}

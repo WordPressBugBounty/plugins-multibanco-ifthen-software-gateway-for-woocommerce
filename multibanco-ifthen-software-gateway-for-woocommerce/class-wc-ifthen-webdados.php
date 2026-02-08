@@ -548,7 +548,12 @@ final class WC_IfthenPay_Webdados {
 		if ( ! $this->log ) {
 			$this->log = wc_get_logger(); // Init log
 		}
-		$this->log->$level( $message, array( 'source' => $gateway_id ) );
+		$log_message = $message;
+		if ( ! empty( $email_message ) ) {
+			$log_message .= ' - Details:
+' . trim( $email_message );
+		}
+		$this->log->$level( $log_message, array( 'source' => $gateway_id ) );
 		if ( ! empty( $debug_email ) ) {
 			if ( empty( $email_message ) ) {
 				$email_message = $message;
@@ -3713,6 +3718,37 @@ final class WC_IfthenPay_Webdados {
 			add_action( 'parse_query', array( PLL(), 'parse_query' ), 6 );
 		}
 		return $orders;
+	}
+
+	/**
+	 * Helper to find order in another state if not found pending payment or on hold
+	 *
+	 * @param string $gateway_id   The gateway ID.
+	 * @param array  $args         The arguments used to search the order.
+	 * @param string $gateway_name The gateway name.
+	 * @return string Error message to be shown in the logs and order notes
+	 */
+	public function callback_helper_order_not_found_error( $gateway_id, $args, $gateway_name ) {
+		$error = 'Error: No orders found awaiting payment with these details';
+		// We should repeat the search without the status to see if the order is already paid or cancelled and warn the store owner + add order note
+		unset( $args['status'] );
+		$orders = WC_IfthenPay_Webdados()->wc_get_orders( $args, $gateway_id );
+		if ( count( $orders ) > 0 ) {
+			// Order(s) found but not pending
+			$this->debug_log_extra( $gateway_id, '-- Callback search without pending statuses found ' . count( $orders ) . ' order(s)' );
+			foreach ( $orders as $order ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedForeach
+				// Just getting the last one
+			}
+			$error = sprintf(
+				/* translators: 1: Payment method name. 2: Order status. */
+				__( 'ifthenpay %1$s callback received but the order is not pending payment. Order status: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+				$gateway_name,
+				wc_get_order_status_name( $order->get_status() )
+			);
+			$order->add_order_note( $error );
+		}
+		// Output
+		return $error;
 	}
 
 	/**

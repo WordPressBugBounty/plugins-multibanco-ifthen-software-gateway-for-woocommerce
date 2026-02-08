@@ -979,7 +979,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						echo esc_html(
 							sprintf(
 								/* translators: %s: payment method used on the ifthenpay Gateway */
-								__( '%s payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+								__( 'ifthenpay %s payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 								WC_IfthenPay_Webdados()->helper_format_method( $order_details['payment_method'] )
 							)
 						);
@@ -1337,7 +1337,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				$arguments_error    = '';
 				if ( trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) !== trim( $this->secret_key ) ) {
 					$arguments_ok     = false;
-					$arguments_error .= ' - Key';
+					$arguments_error .= ' - Anti-phishing key';
 				}
 				if ( trim( $id ) === '' ) { // If using ifthen_webservice_send_order_number_instead_id, this can be a non-numeric value
 					$arguments_ok     = false;
@@ -1437,8 +1437,8 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 							}
 						} else {
 							header( 'HTTP/1.1 200 OK' );
-							$err = 'Error: No orders found awaiting payment with these details';
-							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - No orders found awaiting payment with these details' );
+							$err = WC_IfthenPay_Webdados()->callback_helper_order_not_found_error( $this->id, $args, 'ifthenpay Gateway' );
+							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 							echo esc_html( $err );
 							do_action( 'gateway_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						}
@@ -1502,7 +1502,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 							if ( ! isset( $err ) ) {
 								$err = 'Error: No unprocessed refunds found with these details';
 							}
-							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() . ' - No refunds found with these details' );
+							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - No refunds found with these details' );
 							echo esc_html( $err );
 							do_action( 'gateway_ifthen_callback_refund_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						}
@@ -1517,13 +1517,23 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 					}
 				} else {
 					$err = 'Argument errors';
-					$this->debug_log( '-- ' . $err . $arguments_error, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error );
+					$this->debug_log(
+						'-- ' . $err . $arguments_error,
+						'warning',
+						true,
+						'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error . ' - GET: ' . wp_json_encode( $_GET )
+					);
 					do_action( 'gateway_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					wp_die( esc_html( $err ), 'WC_Gateway_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 				}
 			} else {
 				$err = 'Callback (' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr;
-				$this->debug_log( '- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr );
+				$this->debug_log(
+					'- ' . $err,
+					'warning',
+					true,
+					'GET: ' . wp_json_encode( $_GET )
+				);
 				do_action( 'gateway_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				wp_die( 'Error: Something is missing...', 'WC_Gateway_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 			}

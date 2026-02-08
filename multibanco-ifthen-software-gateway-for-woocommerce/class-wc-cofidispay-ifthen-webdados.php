@@ -1111,6 +1111,10 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			$order_id     = 0;
 			$orders_exist = false;
 
+			$server_http_host   = WC_IfthenPay_Webdados()->get_http_host();
+			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
+			$server_remote_addr = WC_IfthenPay_Webdados()->get_remote_addr();
+
 			if (
 				isset( $_GET['id'] )
 				&&
@@ -1118,7 +1122,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				&&
 				isset( $_GET['wd_secret'] )
 			) {
-				$this->debug_log( '- Return from payment gateway (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with all arguments' );
+				$this->debug_log( '- Return from payment gateway (' . $server_request_uri . ') with all arguments' );
 				$id        = trim( sanitize_text_field( wp_unslash( $_GET['id'] ) ) );
 				$val       = trim( sanitize_text_field( wp_unslash( $_GET['amount'] ) ) ); // Não fazemos float porque 7.40 passaria a 7.4 e depois não validava a hash
 				$wd_secret = trim( sanitize_text_field( wp_unslash( $_GET['wd_secret'] ) ) );
@@ -1174,7 +1178,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 
 				}
 			} else {
-				$error = 'Return from payment gateway (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with missing arguments';
+				$error = 'Return from payment gateway (' . $server_request_uri . ') with missing arguments';
 			}
 
 			// Error and redirect
@@ -1196,6 +1200,10 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 		 */
 		public function callback() {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			$server_http_host   = WC_IfthenPay_Webdados()->get_http_host();
+			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
+			$server_remote_addr = WC_IfthenPay_Webdados()->get_remote_addr();
+
 			@ob_clean(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			// We must 1st check the situation and then process it and send email to the store owner in case of error.
 			if (
@@ -1208,7 +1216,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				isset( $_GET['requestId'] )
 			) {
 				// Let's process it
-				$this->debug_log( '- Callback (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with all arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+				$this->debug_log( '- Callback (' . $server_request_uri . ') with all arguments from ' . $server_remote_addr );
 				$request_id      = str_replace( ' ', '+', trim( sanitize_text_field( wp_unslash( $_GET['requestId'] ) ) ) ); // If there's a plus sign on the URL We'll get it as a space, so we need to get it back
 				$id              = trim( sanitize_text_field( wp_unslash( $_GET['orderId'] ) ) );
 				$val             = floatval( $_GET['amount'] );
@@ -1218,7 +1226,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				$arguments_error = '';
 				if ( $key !== trim( $this->secret_key ) ) {
 					$arguments_ok     = false;
-					$arguments_error .= ' - Key';
+					$arguments_error .= ' - Anti-phishing key';
 				}
 				if ( trim( $request_id ) === '' ) {
 					$arguments_ok     = false;
@@ -1248,7 +1256,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 						}
 					} else {
 						$err = 'Error: No orders found awaiting payment with these details';
-						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr );
 					}
 					if ( $orders_exist ) {
 						if ( $orders_count === 1 ) {
@@ -1265,32 +1273,42 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 							} else {
 								header( 'HTTP/1.1 200 OK' );
 								$err = 'Error: The value does not match';
-								$this->debug_log( '-- ' . $err . ' - Order ' . $order->get_id(), 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() . ' - The value does not match' );
+								$this->debug_log( '-- ' . $err . ' - Order ' . $order->get_id(), 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - The value does not match' );
 								echo esc_html( $err );
 								do_action( 'cofidispay_ifthen_callback_payment_failed', $order->get_id(), $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 							}
 						} else {
 							header( 'HTTP/1.1 200 OK' );
 							$err = 'Error: More than 1 order found awaiting payment with these details';
-							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() . ' - More than 1 order found awaiting payment with these details' );
+							$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - More than 1 order found awaiting payment with these details' );
 							echo esc_html( $err );
 							do_action( 'cofidispay_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						}
 					} else {
 						header( 'HTTP/1.1 200 OK' );
-						$err = 'Error: No orders found awaiting payment with these details';
-						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') from ' . WC_IfthenPay_Webdados()->get_remote_addr() . ' - No orders found awaiting payment with these details' );
+						$err = WC_IfthenPay_Webdados()->callback_helper_order_not_found_error( $this->id, $args, 'Cofidis Pay' );
+						$this->debug_log( '-- ' . $err, 'warning', true, 'Callback (' . $server_http_host . ' ' . $server_request_uri . ') from ' . $server_remote_addr . ' - No orders found awaiting payment with these details' );
 						echo esc_html( $err );
 						do_action( 'cofidispay_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					}
 				} else {
-					$this->debug_log( '-- ' . $err . $arguments_error, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') with argument errors from ' . WC_IfthenPay_Webdados()->get_remote_addr() . $arguments_error );
+					$this->debug_log(
+						'-- ' . $err . $arguments_error,
+						'warning',
+						true,
+						'Callback (' . $server_http_host . ' ' . $server_request_uri . ') with argument errors from ' . $server_remote_addr . $arguments_error . ' - GET: ' . wp_json_encode( $_GET )
+					);
 					do_action( 'cofidispay_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					wp_die( esc_html( $err ), 'WC_CofidisPay_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 				}
 			} else {
-				$err = 'Callback (' . WC_IfthenPay_Webdados()->get_request_uri() . ') with missing arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr();
-				$this->debug_log( '- ' . $err, 'warning', true, 'Callback (' . WC_IfthenPay_Webdados()->get_http_host() . ' ' . WC_IfthenPay_Webdados()->get_request_uri() . ') with missing arguments from ' . WC_IfthenPay_Webdados()->get_remote_addr() );
+				$err = 'Callback (' . $server_request_uri . ') with missing arguments from ' . $server_remote_addr;
+				$this->debug_log(
+					'- ' . $err,
+					'warning',
+					true,
+					'GET: ' . wp_json_encode( $_GET )
+				);
 				do_action( 'cofidispay_ifthen_callback_payment_failed', 0, $err, $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				wp_die( 'Error: Something is missing...', 'WC_CofidisPay_IfThen_Webdados', array( 'response' => 500 ) ); // Sends 500
 			}
