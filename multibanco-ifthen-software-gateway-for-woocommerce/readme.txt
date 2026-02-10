@@ -4,7 +4,7 @@ Tags: ifthenpay, ecommerce, portugal, atm, homebanking
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 11.4.0
+Stable tag: 11.4.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,10 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 11.4.1 - 2026-02-10 =
+* [TWEAK] Allow [PRO add-on 5.8](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) to cancel or convert to Multibanco expired MB WAY orders after 20 minutes of expiration
+* [DEV] Tested with WordPress 7.0-alpha-61605 and WooCommerce 10.5.1
 
 = 11.4.0 - 2026-01-21 =
 * [TWEAK] Order note and debug (including email) when order is found by callback, but not in pending statuses (for example, already paid or cancelled)

@@ -2800,15 +2800,20 @@ final class WC_IfthenPay_Webdados {
 	 * Cancel expired orders for a specific payment method
 	 *
 	 * @param string $method_id The payment methid ID.
+	 * @param string $datetime  The datetime to compare with the expiration meta (in Y-m-d H:i:s format) - if null, it will use the current datetime, allowing for time delays.
 	 */
-	public function cancel_expired_orders( $method_id ) {
+	public function cancel_expired_orders( $method_id, $datetime = null ) {
+		// Accept time delays
+		if ( ! $datetime ) {
+			$datetime = date_i18n( 'Y-m-d H:i:s' );
+		}
 		// We are not doing this on the gateway itself because the cron doesn't always load the gateways
 		$args           = array(
 			'status'                  => array( 'on-hold', 'pending' ), // Aqui não usamos os unpaid statuses porque podemos entrar num loop se alguém adicionar o estado cancelada e também porque não faz sentido para parcialmente pagas
 			'type'                    => array( 'shop_order' ),
 			'limit'                   => -1,
 			'payment_method'          => $method_id,
-			'_' . $method_id . '_exp' => date_i18n( 'Y-m-d H:i:s' ),
+			'_' . $method_id . '_exp' => $datetime,
 		);
 		$expired_orders = WC_IfthenPay_Webdados()->wc_get_orders( $args, $method_id );
 		if ( $expired_orders ) {
