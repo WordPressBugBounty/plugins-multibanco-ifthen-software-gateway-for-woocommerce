@@ -4,7 +4,7 @@ Tags: ifthenpay, ecommerce, portugal, atm, homebanking
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 11.5.0
+Stable tag: 11.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -254,6 +254,10 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 11.5.1 - 2026-02-24 =
+* [TWEAK] Retouch some SVG icons
+* [FIX] “Deprecated: Creation of dynamic property notices” for the new “icon path” properties introduced in 11.5.0
 
 = 11.5.0 - 2026-02-23 =
 * [TWEAK] Expose icons paths to [PRO add-on 6.0](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) so it can render the new “ifthenpay Payment Logos” block and shortcode
