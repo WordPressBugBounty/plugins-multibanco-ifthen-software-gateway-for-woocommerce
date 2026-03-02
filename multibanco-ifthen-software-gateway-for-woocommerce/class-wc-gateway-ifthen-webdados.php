@@ -978,7 +978,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						$order_details = WC_IfthenPay_Webdados()->get_gatewayifthenpay_order_details( $order_id );
 						echo esc_html(
 							sprintf(
-								/* translators: %s: payment method used on the ifthenpay Gateway */
+								/* translators: %s: payment method */
 								__( 'ifthenpay %s payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 								WC_IfthenPay_Webdados()->helper_format_method( $order_details['payment_method'] )
 							)
@@ -1382,9 +1382,9 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 								) {
 									if ( floatval( $val ) === floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ) ) ) {
 										$note = sprintf(
-											/* translators: %s payment method */
-											__( 'ifthenpay Gateway payment received via %s.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-											$payment_method
+											/* translators: %s: payment method */
+											__( 'ifthenpay %s payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+											WC_IfthenPay_Webdados()->helper_format_method( $payment_method )
 										);
 										if ( isset( $_GET['payment_datetime'] ) ) {
 											$note .= ' ' . trim( sanitize_text_field( wp_unslash( $_GET['payment_datetime'] ) ) );

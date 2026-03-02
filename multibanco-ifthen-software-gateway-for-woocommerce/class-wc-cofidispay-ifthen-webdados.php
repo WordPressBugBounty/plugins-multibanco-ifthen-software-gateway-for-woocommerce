@@ -25,6 +25,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 		public $debug_email;
 		public $version;
 		public $secret_key;
+		public $order_initial_status_pending;
 		public $api_url;
 		public $limits_api_url;
 		public $cofidispaykey;
@@ -72,6 +73,9 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				// Let's set the callback activation email as NOT sent
 				update_option( $this->id . '_callback_email_sent', 'no', false );
 			}
+
+			// on hold or pending?
+			$this->order_initial_status_pending = apply_filters( 'cofidispay_ifthen_order_initial_status_pending', true );
 
 			// Webservice
 			$this->api_url        = 'https://api.ifthenpay.com/cofidis/init/'; // production and test mode, depends on Cofidis Pay Key
@@ -1011,8 +1015,13 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			if ( $order->get_total() > 0 ) {
 				$redirect_url = $this->api_init_payment( $order->get_id() );
 				if ( $redirect_url ) {
-					// Mark pending
-					WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', 'Cofidis Pay' );
+					if ( ! $this->order_initial_status_pending ) {
+						// Mark as on-hold
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'on-hold', 'Cofidis Pay' );
+					} else {
+						// Mark as pending
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', 'Cofidis Pay' );
+					}
 				} else {
 					throw new Exception(
 						sprintf(
