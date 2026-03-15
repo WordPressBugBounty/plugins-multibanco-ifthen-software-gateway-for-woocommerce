@@ -1213,6 +1213,9 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			$server_request_uri = WC_IfthenPay_Webdados()->get_request_uri();
 			$server_remote_addr = WC_IfthenPay_Webdados()->get_remote_addr();
 
+			// Remove Anti-phishing key from debug log - If incorrect, there's no point in removing it, and if correct, we should not log it
+			$server_request_uri = str_replace( 'key=' . trim( $this->secret_key ), 'key=[CORRECT_ANTIPHISHING_KEY]', $server_request_uri );
+
 			@ob_clean(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			// We must 1st check the situation and then process it and send email to the store owner in case of error.
 			if (

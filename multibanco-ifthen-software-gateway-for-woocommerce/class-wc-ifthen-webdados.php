@@ -629,7 +629,12 @@ final class WC_IfthenPay_Webdados {
 	 */
 	public function debug_log_extra( $gateway_id, $message, $level = 'debug', $debug_email = '', $email_message = '' ) {
 		if ( apply_filters( 'ifthen_debug_log_extra', false ) ) {
+			// Get URL if possible
 			$url = WC_IfthenPay_Webdados()->get_request_uri() ? WC_IfthenPay_Webdados()->get_request_uri() : 'Unknown request URI';
+			// Remove anti-phishing key from URL for security reasons
+			$url = preg_replace( '/([&?]chave=)[^&]+/', '$1[REDACTED]', $url );
+			$url = preg_replace( '/([&?]key=)[^&]+/', '$1[REDACTED]', $url );
+			// Log
 			$this->debug_log( $gateway_id, 'EXTRA (' . $url . ') - ' . $message, $level, $debug_email, $email_message );
 		}
 	}
