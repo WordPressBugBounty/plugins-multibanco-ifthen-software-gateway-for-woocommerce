@@ -66,7 +66,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			$this->secret_key = $this->get_option( 'secret_key' );
 			if ( trim( $this->secret_key ) === '' ) {
 				// First load?
-				$this->secret_key = md5( home_url() . time() . wp_rand( 0, 999 ) );
+				$this->secret_key = wp_generate_password( 32, false );
 				// Save
 				$this->update_option( 'secret_key', $this->secret_key );
 				$this->update_option( 'debug', 'yes' );
@@ -922,7 +922,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			$order             = wc_get_order( $order_id );
 			$valor             = WC_IfthenPay_Webdados()->get_order_total_to_pay_for_gateway( $order );
 			$cofidispaykey     = apply_filters( 'multibanco_ifthen_base_cofidispaykey', $this->cofidispaykey, $order );
-			$wd_secret         = substr( strrev( md5( time() ) ), 0, 10 ); // Set a secret on our end for extra validation
+			$wd_secret         = wp_generate_password( 10, false ); // Set a secret on our end for extra validation
 			$id_for_backoffice = apply_filters( 'ifthen_webservice_send_order_number_instead_id', false ) ? $order->get_order_number() : $order->get_id();
 			$desc              = trim( get_bloginfo( 'name' ) );
 			$desc              = substr( $desc, 0, COFIDISPAY_IFTHEN_DESC_LEN - strlen( ' #' . $order->get_order_number() ) );
@@ -1272,7 +1272,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 					}
 					if ( $orders_exist ) {
 						if ( $orders_count === 1 ) {
-							if ( floatval( $val ) === floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ) ) ) {
+							if ( number_format( (float) $val, 2, '.', '' ) === number_format( (float) WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ), 2, '.', '' ) ) {
 								$note = __( 'Cofidis Pay payment approval received.', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 								if ( ! empty( $datahorapag ) ) {
 									$note .= ' ' . $datahorapag;
@@ -1359,7 +1359,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 			}
 			if ( $orders_exist ) {
 				if ( $orders_count === 1 ) {
-					if ( floatval( $val ) === floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ) ) ) {
+					if ( number_format( (float) $val, 2, '.', '' ) === number_format( (float) WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ), 2, '.', '' ) ) {
 						$return['success'] = true;
 						$return['order']   = $order;
 						return $return;
@@ -1451,7 +1451,7 @@ if ( ! class_exists( 'WC_CofidisPay_IfThen_Webdados' ) ) {
 				// Not prevented by filter
 				( ! apply_filters( 'multibanco_ifthen_hide_newmethod_notifications', false ) )
 				&&
-				// Check if dismissed in the last 180 days
+				// Check if dismissed in the last 365 days
 				( intval( get_user_meta( get_current_user_id(), $this->id . '_newmethod_notice_dismiss_until', true ) ) < time() )
 				&&
 				// Check if 90-day dismissal is active - Legacy support

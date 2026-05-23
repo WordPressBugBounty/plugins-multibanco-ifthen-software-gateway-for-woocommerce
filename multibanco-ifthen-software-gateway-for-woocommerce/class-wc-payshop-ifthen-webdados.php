@@ -65,7 +65,7 @@ if ( ! class_exists( 'WC_Payshop_IfThen_Webdados' ) ) {
 			$this->secret_key = $this->get_option( 'secret_key' );
 			if ( trim( $this->secret_key ) === '' ) {
 				// First load?
-				$this->secret_key = md5( home_url() . time() . wp_rand( 0, 999 ) );
+				$this->secret_key = wp_generate_password( 32, false );
 				// Save
 				$this->update_option( 'secret_key', $this->secret_key );
 				$this->update_option( 'debug', 'yes' );
@@ -1304,7 +1304,7 @@ if ( ! class_exists( 'WC_Payshop_IfThen_Webdados' ) ) {
 
 						if ( $orders_exist ) {
 							if ( $orders_count === 1 ) {
-								if ( floatval( $val ) === floatval( WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ) ) ) {
+								if ( number_format( (float) $val, 2, '.', '' ) === number_format( (float) WC_IfthenPay_Webdados()->get_order_total_to_pay( $order ), 2, '.', '' ) ) {
 									$note = sprintf(
 										/* translators: %s: payment method */
 										__( 'ifthenpay %s payment received.', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
@@ -1318,7 +1318,7 @@ if ( ! class_exists( 'WC_Payshop_IfThen_Webdados' ) ) {
 										if ( $order->get_meta( '_wc_deposits_order_has_deposit' ) === 'yes' ) { // Has deposit
 											if ( $order->get_meta( '_wc_deposits_deposit_paid' ) === 'yes' ) { // First payment - OK!
 												if ( $order->get_meta( '_wc_deposits_second_payment_paid' ) !== 'yes' ) { // Second payment - not ok
-													if ( floatval( $order->get_meta( '_wc_deposits_second_payment' ) ) === floatval( $val ) ) { // This really seems like the second payment
+													if ( number_format( (float) $order->get_meta( '_wc_deposits_second_payment' ), 2, '.', '' ) === number_format( (float) $val, 2, '.', '' ) ) { // This really seems like the second payment
 														// Set the current order status temporarly back to partially-paid, but first stop the emails
 														add_filter( 'woocommerce_email_enabled_customer_partially_paid', '__return_false' );
 														add_filter( 'woocommerce_email_enabled_partial_payment', '__return_false' );
@@ -1470,7 +1470,7 @@ if ( ! class_exists( 'WC_Payshop_IfThen_Webdados' ) ) {
 				// Not prevented by filter
 				( ! apply_filters( 'multibanco_ifthen_hide_newmethod_notifications', false ) )
 				&&
-				// Check if dismissed in the last 180 days
+				// Check if dismissed in the last 365 days
 				( intval( get_user_meta( get_current_user_id(), $this->id . '_newmethod_notice_dismiss_until', true ) ) < time() )
 				&&
 				// Check if 90-day dismissal is active - Legacy support

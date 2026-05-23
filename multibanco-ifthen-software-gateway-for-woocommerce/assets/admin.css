@@ -105,3 +105,20 @@
 	margin: 0px;
 	font-weight: bold;
 }
+
+
+.payment-list-ifthen-badge {
+	display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+	background:	#e3f5ff;
+    color: #000000;
+    border-radius: 3px;
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 1.6;
+    vertical-align: middle;
+}
+.payment-list-ifthen-badge-icon {
+	margin-right: 4px;
+}
