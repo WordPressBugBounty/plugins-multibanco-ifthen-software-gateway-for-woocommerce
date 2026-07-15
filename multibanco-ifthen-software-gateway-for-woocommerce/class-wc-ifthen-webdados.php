@@ -1094,11 +1094,7 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'Multibanco'
-					) . '.</p>';
+					$this->multibanco_order_metabox_html_data_missing( 'Multibanco' );
 				}
 				break;
 			// MB WAY
@@ -1205,11 +1201,7 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'MB WAY'
-					) . '.</p>';
+					$this->multibanco_order_metabox_html_data_missing( 'MB WAY' );
 				}
 				break;
 			// Payshop
@@ -1274,11 +1266,7 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'Payshop'
-					) . '.</p>';
+					$this->multibanco_order_metabox_html_data_missing( 'Payshop' );
 				}
 				break;
 			// Credit card
@@ -1340,12 +1328,7 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'Credit card'
-					) . '.</p>';
-
+					$this->multibanco_order_metabox_html_data_missing( 'Credit card' );
 				}
 				break;
 			// Cofidis Pay
@@ -1404,12 +1387,7 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'Cofidis Pay'
-					) . '.</p>';
-
+					$this->multibanco_order_metabox_html_data_missing( 'Cofidis Pay' );
 				}
 				break;
 			// ifthenpay Gateway
@@ -1495,18 +1473,15 @@ final class WC_IfthenPay_Webdados {
 						echo '<p><strong>' . esc_html__( 'Paid', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . ' - ' . esc_html( $this->helper_format_method( $order_mb_details['payment_method'] ) ) . ': ' . esc_html( $date_paid ) . '</strong></p>';
 					}
 				} else {
-					echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . sprintf(
-						/* translators: $s: payment method */
-						esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'ifthenpay Gateway'
-					) . '.</p>';
-
+					$this->multibanco_order_metabox_html_data_missing( 'ifthenpay Gateway' );
 				}
 				break;
 			// None
 			default:
-				echo '<p>' . esc_html__( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p><p>' . esc_html__( 'The payment method of this order is not ifthenpay', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '.</p>';
-				echo '<style type="text/css">#' . esc_html( $this->multibanco_id ) . ' { display: none; }</style>';
+				?>
+				<p><?php esc_html_e( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></p>
+				<p><?php esc_html_e( 'The payment method of this order is not one of ifthenpay', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></p>
+				<?php
 				$deleted = false;
 				// If we have Multibanco data, we should delete it
 				$order_mb_details = $this->get_multibanco_order_details( $order->get_id() );
@@ -1561,6 +1536,26 @@ final class WC_IfthenPay_Webdados {
 				}
 				break;
 		}
+	}
+
+	/**
+	 * Show a message in the order details page when we expect to have data but it's missing, to help debugging
+	 *
+	 * @param string $payment_method The payment method that is missing data.
+	 */
+	private function multibanco_order_metabox_html_data_missing( $payment_method ) {
+		?>
+		<p><?php esc_html_e( 'No details available', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></p>
+		<p>
+			<?php
+			printf(
+				/* translators: $s: payment method */
+				esc_html__( 'This must be an error because the payment method of this order is %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
+				esc_html( $payment_method )
+			);
+			?>
+		</p>
+		<?php
 	}
 
 	/**
@@ -2139,7 +2134,7 @@ final class WC_IfthenPay_Webdados {
 						'limit'      => 1, // If there's one, it's enough
 						'_' . $this->multibanco_id . '_ent' => $ent,
 						'_' . $this->multibanco_id . '_ref' => $ref,
-						'date_after' => date_i18n( 'Y-m-d', strtotime( '-' . intval( $no_repeat_days ) . ' days ' ) ),
+						'date_after' => date_i18n( 'Y-m-d', strtotime( '-' . intval( $no_repeat_days ) . ' days ', current_time( 'timestamp' ) ) ), // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 					),
 					$this->multibanco_id
 				);
@@ -2702,6 +2697,7 @@ final class WC_IfthenPay_Webdados {
 					case '_' . $this->multibanco_id . '_exp':
 					case '_' . $this->mbway_id . '_exp':
 					case '_' . $this->payshop_id . '_exp':
+					case '_' . $this->creditcard_id . '_time':
 						$query['meta_query'][] = array(
 							'key'     => $key,
 							'value'   => esc_attr( $value ), // WHY esc_attr?
@@ -4131,38 +4127,38 @@ final class WC_IfthenPay_Webdados {
 				)
 			) {
 				$notices = array();
-				// WordPress below 6.0
-				if ( version_compare( get_bloginfo( 'version' ), '6.0', '<' ) ) {
+				// WordPress below 6.7
+				if ( version_compare( get_bloginfo( 'version' ), '6.7', '<' ) ) {
 					$notices[] = sprintf(
 						/* translators: %1$s: required software name and version, %2$s: current version */
 						esc_html__( '%1$s - Your version: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'<strong>WordPress 6.0</strong>',
+						'<strong>WordPress 6.7</strong>',
 						sprintf(
 							'<strong style="color:red;">%s</strong>',
 							get_bloginfo( 'version' )
 						)
 					);
 				}
-				// WooCommerce below 8.0
-				if ( version_compare( WC_VERSION, '8.0', '<' ) ) {
+				// WooCommerce below 9.6
+				if ( version_compare( WC_VERSION, '9.6', '<' ) ) {
 					$notices[] = sprintf(
 						/* translators: %1$s: required software name and version, %2$s: current version */
 						esc_html__( '%1$s - Your version: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'<strong>WooCommerce 8.0</strong>',
+						'<strong>WooCommerce 9.6</strong>',
 						sprintf(
 							'<strong style="color:red;">%s</strong>',
 							WC_VERSION
 						)
 					)
 					.
-					' - <strong>' . esc_html__( 'Support for WooCommerce &lt; 8.0 will end soon!', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</strong>';
+					' - <strong>' . esc_html__( 'Support for WooCommerce &lt; 9.6 will end soon!', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</strong>';
 				}
-				// PHP below 7.4
-				if ( version_compare( phpversion(), '7.4', '<' ) ) {
+				// PHP below 8.0
+				if ( version_compare( phpversion(), '8.0', '<' ) ) {
 					$notices[] = sprintf(
 						/* translators: %1$s: required software name and version, %2$s: current version */
 						esc_html__( '%1$s - Your version: %2$s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-						'<strong>PHP 7.4</strong>',
+						'<strong>PHP 8.0</strong>',
 						sprintf(
 							'<strong style="color:red;">%s</strong>',
 							phpversion()

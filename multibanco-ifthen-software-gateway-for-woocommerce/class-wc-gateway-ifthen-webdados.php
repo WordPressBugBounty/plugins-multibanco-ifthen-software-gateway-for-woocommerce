@@ -23,6 +23,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 		public $debug_email;
 		public $version;
 		public $secret_key;
+		public $order_initial_status_pending;
 		public $api_url_production;
 		public $api_url_sandbox;
 		public $api_url;
@@ -76,11 +77,14 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				$this->update_option( 'debug', 'yes' );
 			}
 
+			// on hold or pending?
+			$this->order_initial_status_pending = apply_filters( 'gateway_ifthen_order_initial_status_pending', true );
+
 			// Webservice
 			$this->api_url_production       = 'https://api.ifthenpay.com/gateway/pinpay/'; // production mode
-			$this->api_url_sandbox          = ''; // test mode?
+			$this->api_url_sandbox          = ''; // test mode? Does not exist yet
 			$this->api_url                  = '';
-			$this->gateways_api_url         = 'https://www.ifthenpay.com/IfmbWS/ifthenpaymobile.asmx/GetGatewayKeys';
+			$this->gateways_api_url         = 'https://api.ifthenpay.com/gateway/get'; // Since 2026-06
 			$this->gateways_methods_api_url = 'https://www.ifthenpay.com/IfmbWS/ifthenpaymobile.asmx/GetAccountsByGatewayKey';
 
 			// Plugin options and settings
@@ -107,6 +111,9 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 					$this->methods_keys[ $method ] = $this->get_option( 'method_' . $method );
 				}
 			}
+
+			// API URL
+			$this->api_url = apply_filters( 'gateway_ifthen_sandbox', false ) ? $this->api_url_sandbox : $this->api_url_production;
 
 			// Actions and filters
 			if ( self::$instances === 1 ) { // Avoid duplicate actions and filters if it's initiated more than once (if WooCommerce loads after us)
@@ -143,9 +150,6 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				// Admin notices
 				add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
-				// API URL
-				$this->api_url = apply_filters( 'gateway_ifthen_sandbox', false ) ? $this->api_url_sandbox : $this->api_url_production;
-
 				// Method title in frontend
 				if ( apply_filters( 'gateway_ifthen_add_frontend_title', true ) ) {
 					$this->title .= ' - ' . __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' );
@@ -153,7 +157,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 
 				// Method title in sandbox mode
 				if ( apply_filters( 'gateway_ifthen_sandbox', false ) ) {
-					$this->title .= ' - SANDBOX (TEST MODE)';
+					$this->title .= ' - SANDBOX (TEST MODE - DOES NOT EXIST YET, payment requests will fail)';
 				}
 
 				// Frontend availability checker for Apple and Google Pay - Maybe later
@@ -222,7 +226,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 							if ( ! is_numeric( $gateway_method->Entidade ) ) {
 								if ( ! in_array(
 									trim( $gateway_method->Entidade ),
-									apply_filters( 'gateway_ifthen_unavailable_methods', array( 'MB', 'MBWAY', 'PAYSHOP', 'CCARD', 'COFIDIS' ) ),
+									apply_filters( 'gateway_ifthen_unavailable_methods', array( 'MB', 'MBWAY', 'PAYSHOP', 'CCARD', 'COFIDIS', 'BIZUM' ) ),
 									true
 								) ) {
 									if ( ! isset( $available_methods[ trim( $gateway_method->Entidade ) ] ) ) {
@@ -308,8 +312,20 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 					);
 					$count_gateways                  = 0;
 					foreach ( $gateways as $gateway ) {
-						if ( $gateway->Tipo === 'Estáticas' || apply_filters( 'gateway_ifthen_allow_dynamic_gateways', false ) ) {
-							$this->form_fields['gatewaykey']['options'][ $gateway->GatewayKey ] = $gateway->Alias . ( $gateway->Tipo !== 'Estáticas' ? ' (' . trim( $gateway->Tipo ) . ')' : '' );
+						if (
+							// Since June 2026, all new gateways will be "Woocommerce"
+							strcasecmp( trim( $gateway->Tipo ), 'Woocommerce' ) === 0
+							||
+							// Keep dynamic gateways available if the filter is enabled, for backwards compatibility
+							( strcasecmp( trim( $gateway->Tipo ), 'Dinâmicas' ) === 0 && apply_filters( 'gateway_ifthen_allow_dynamic_gateways', false ) )
+							||
+							// Keep static gateways available if the filter is enabled, for backwards compatibility
+							( strcasecmp( trim( $gateway->Tipo ), 'Estáticas' ) === 0 && apply_filters( 'gateway_ifthen_allow_static_gateways', false ) )
+							||
+							// Keep the selected gateway available even if it's not "WooCommerce", for backwards compatibility
+							strcasecmp( $gateway->GatewayKey, trim( $this->get_option( 'gatewaykey' ) ) ) === 0
+						) {
+							$this->form_fields['gatewaykey']['options'][ $gateway->GatewayKey ] = $gateway->Alias . ' (' . trim( str_replace( 'Woocommerce', 'WooCommerce', $gateway->Tipo ) ) . ')';
 							++$count_gateways;
 						}
 					}
@@ -440,13 +456,9 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						'label'       => __( 'Enable logging', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 						'default'     => 'yes',
 						'description' => sprintf(
-							/* translators: %s: file name or link to logs */
+							/* translators: %s: link to logs */
 							__( 'Log payment method events in %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-							( ( defined( 'WC_LOG_HANDLER' ) && 'WC_Log_Handler_DB' === WC_LOG_HANDLER ) || version_compare( WC_VERSION, '8.6', '>=' ) )
-							?
 							'<a href="admin.php?page=wc-status&tab=logs&source=' . esc_attr( $this->id ) . '" target="_blank">' . __( 'WooCommerce &gt; Status &gt; Logs', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</a>'
-							:
-							'<code>' . wc_get_log_file_path( $this->id ) . '</code>'
 						),
 					),
 					'debug_email' => array(
@@ -623,8 +635,11 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				$backoffice_key = trim( sanitize_text_field( wp_unslash( $_POST[ 'woocommerce_' . $this->id . '_backoffice_key' ] ) ) );
 				if ( strlen( $backoffice_key ) === 19 ) {
 					if ( $backoffice_key !== $this->backoffice_key ) {
+						// Clear currently selected gateway from payment method options
+						$this->settings['gatewaykey'] = '';
 						// Update gateways
-						$url      = $this->gateways_api_url . '?backofficekey=' . $backoffice_key;
+						// $url      = $this->gateways_api_url . '?backofficekey=' . $backoffice_key;
+						$url      = $this->gateways_api_url . '?boKey=' . $backoffice_key . '&type=Dinâmicas;Estáticas;Woocommerce';
 						$response = wp_remote_get( $url );
 						if ( ! is_wp_error( $response ) ) {
 							if ( isset( $response['response']['code'] ) && intval( $response['response']['code'] ) === 200 && isset( $response['body'] ) && trim( $response['body'] ) !== '' ) {
@@ -646,6 +661,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 							delete_option( $this->id . '_gateways' );
 							delete_option( $this->id . '_gateway_methods' );
 						}
+						update_option( $this->get_option_key(), apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $this->id, $this->settings ), 'yes' );
 					} elseif ( isset( $_POST[ 'woocommerce_' . $this->id . '_gatewaykey' ] ) ) {
 						$gatewaykey = trim( sanitize_text_field( wp_unslash( $_POST[ 'woocommerce_' . $this->id . '_gatewaykey' ] ) ) );
 						if ( strlen( $gatewaykey ) === 11 ) {
@@ -751,6 +767,10 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						}
 					}
 				} elseif ( strlen( $backoffice_key ) === 0 ) {
+					// Clear currently selected gateway from payment method options
+					$this->settings['gatewaykey'] = '';
+					update_option( $this->get_option_key(), apply_filters( 'woocommerce_settings_api_sanitized_fields_' . $this->id, $this->settings ), 'yes' );
+					// Error handling missing
 					delete_option( $this->id . '_gateways' );
 					delete_option( $this->id . '_gateway_methods' );
 				}
@@ -1050,29 +1070,36 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 			$args['body']     = wp_json_encode( $args['body'] ); // Json not post variables
 			$response         = wp_remote_post( $url, $args );
 			if ( is_wp_error( $response ) ) {
-				$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - ' . $response->get_error_message();
-				$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
+				$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Error: ' . $response->get_error_code() . ' ' . $response->get_error_message();
+				$debug_msg_email = $debug_msg . ' - URL: ' . $url . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
 				$this->debug_log( $debug_msg, 'error', true, $debug_msg_email );
 				return false;
 			} elseif ( isset( $response['response']['code'] ) && intval( $response['response']['code'] ) === 200 && isset( $response['body'] ) && trim( $response['body'] ) !== '' ) {
 				$body = json_decode( trim( $response['body'] ) );
 				if ( $body ) {
-					WC_IfthenPay_Webdados()->set_order_gatewayifthenpay_details(
-						$order->get_id(),
-						array(
-							'gatewaykey'  => $gatewaykey,
-							'pincode'     => $body->PinCode,
-							'id'          => apply_filters( 'ifthen_webservice_send_order_number_instead_id', false ) ? $order->get_order_number() : $order->get_id(),
-							'val'         => $valor,
-							'payment_url' => $body->RedirectUrl,
-							'wd_secret'   => $wd_secret,
-						)
-					);
-					$this->debug_log( '- ifthenpay Gateway payment request created on ifthenpay servers - Redirecting to payment gateway - Order ' . $order->get_id() . ' - Pincode: ' . $body->PinCode );
-					do_action( 'gateway_ifthen_created_reference', $body->PinCode, $order->get_id() );
-					$debug_elapsed_time = microtime( true ) - $debug_start_time;
-					$this->debug_log_extra( 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
-					return $body->RedirectUrl;
+					if ( ( ! empty( $body->RedirectUrl ) ) && ( ! empty( $body->PinCode ) ) ) {
+						WC_IfthenPay_Webdados()->set_order_gatewayifthenpay_details(
+							$order->get_id(),
+							array(
+								'gatewaykey'  => $gatewaykey,
+								'pincode'     => $body->PinCode,
+								'id'          => apply_filters( 'ifthen_webservice_send_order_number_instead_id', false ) ? $order->get_order_number() : $order->get_id(),
+								'val'         => $valor,
+								'payment_url' => $body->RedirectUrl,
+								'wd_secret'   => $wd_secret,
+							)
+						);
+						$this->debug_log( '- ifthenpay Gateway payment request created on ifthenpay servers - Redirecting to payment gateway - Order ' . $order->get_id() . ' - Pincode: ' . $body->PinCode );
+						do_action( 'gateway_ifthen_created_reference', $body->PinCode, $order->get_id() );
+						$debug_elapsed_time = microtime( true ) - $debug_start_time;
+						$this->debug_log_extra( 'wp_remote_post + response handling took: ' . $debug_elapsed_time . ' seconds.' );
+						return $body->RedirectUrl;
+					} else {
+						$debug_msg       = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Missing RedirectUrl or PinCode in response body';
+						$debug_msg_email = $debug_msg . ' - Args: ' . wp_json_encode( $args ) . ' - Response: ' . wp_json_encode( $response );
+						$this->debug_log( $debug_msg, 'error', true, $debug_msg_email );
+						return false;
+					}
 				} else {
 					$debug_msg = '- Error contacting the ifthenpay servers - Order ' . $order->get_id() . ' - Can not json_decode body';
 					$this->debug_log( $debug_msg, 'error', true, $debug_msg );
@@ -1106,8 +1133,13 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 						add_filter( 'woocommerce_email_enabled_customer_processing_order', '__return_false' );
 						add_filter( 'woocommerce_email_enabled_full_payment', '__return_false' );
 					}
-					// Mark pending
-					WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					if ( ! $this->order_initial_status_pending ) {
+						// Mark as on-hold
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'on-hold', __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					} else {
+						// Mark pending
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', __( 'ifthenpay Gateway', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					}
 				} else {
 					throw new Exception(
 						sprintf(
@@ -1338,7 +1370,7 @@ if ( ! class_exists( 'WC_Gateway_IfThen_Webdados' ) ) {
 				$request_id         = trim( sanitize_text_field( wp_unslash( $_GET['request_id'] ) ) ); // This is what we'll use for refunds later
 				$arguments_ok       = true;
 				$arguments_error    = '';
-				if ( trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) !== trim( $this->secret_key ) ) {
+				if ( ! hash_equals( trim( $this->secret_key ), trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) ) ) {
 					$arguments_ok     = false;
 					$arguments_error .= ' - Anti-phishing key';
 				}

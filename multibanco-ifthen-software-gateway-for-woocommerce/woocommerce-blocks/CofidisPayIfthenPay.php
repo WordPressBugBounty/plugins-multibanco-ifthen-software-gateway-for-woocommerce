@@ -5,6 +5,8 @@
 
 namespace Automattic\WooCommerce\Blocks\Payments\Integrations;
 
+defined( 'ABSPATH' ) || exit;
+
 use Automattic\WooCommerce\Blocks\Assets\Api;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
 
@@ -57,13 +59,15 @@ final class CofidisPayIfthenPay extends AbstractPaymentMethodType {
 	 * @return array
 	 */
 	public function get_payment_method_script_handles() {
+		$asset_file = include plugin_dir_path( __FILE__ ) . 'build/cofidispay-block.asset.php';
 		wp_register_script(
 			'wc-payment-method-cofidispay-ifthenpay',
 			plugins_url( 'build/cofidispay-block.js', __FILE__ ),
-			array(),
+			$asset_file['dependencies'],
 			WC_IfthenPay_Webdados()->get_version() . ( WP_DEBUG ? '.' . wp_rand( 0, 9999 ) : '' ),
 			true
 		);
+		wp_set_script_translations( 'wc-payment-method-cofidispay-ifthenpay', 'multibanco-ifthen-software-gateway-for-woocommerce' );
 		return array( 'wc-payment-method-cofidispay-ifthenpay' );
 	}
 

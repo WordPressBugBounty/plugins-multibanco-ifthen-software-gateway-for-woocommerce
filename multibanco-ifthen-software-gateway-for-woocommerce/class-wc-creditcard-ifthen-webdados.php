@@ -23,6 +23,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 		public $debug_email;
 		public $version;
 		public $secret_key;
+		public $order_initial_status_pending;
 		public $api_url_production;
 		public $api_url_sandbox;
 		public $api_url;
@@ -75,6 +76,9 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 				update_option( $this->id . '_callback_email_sent', 'no', false );
 			}
 
+			// on hold or pending?
+			$this->order_initial_status_pending = apply_filters( 'creditcard_ifthen_order_initial_status_pending', true );
+
 			// Webservice
 			$this->api_url_production = 'https://ifthenpay.com/api/creditcard/init/'; // production mode
 			$this->api_url_sandbox    = 'https://ifthenpay.com/api/creditcard/sandbox/init/'; // test mode
@@ -98,6 +102,9 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 			if ( $this->do_refunds && trim( $this->do_refunds_backoffice_key ) !== '' ) {
 				$this->supports[] = 'refunds';
 			}
+
+			// API URL
+			$this->api_url = apply_filters( 'creditcard_ifthen_sandbox', false ) ? $this->api_url_sandbox : $this->api_url_production;
 
 			// Actions and filters
 			if ( self::$instances === 1 ) { // Avoid duplicate actions and filters if it's initiated more than once (if WooCommerce loads after us)
@@ -139,9 +146,6 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 
 				// Admin notices
 				add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-
-				// API URL
-				$this->api_url = apply_filters( 'creditcard_ifthen_sandbox', false ) ? $this->api_url_sandbox : $this->api_url_production;
 
 				// Method title in sandbox mode
 				if ( apply_filters( 'creditcard_ifthen_sandbox', false ) ) {
@@ -322,13 +326,9 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 						'label'       => __( 'Enable logging', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
 						'default'     => 'yes',
 						'description' => sprintf(
-							/* translators: %s: file name or link to logs */
+							/* translators: %s: link to logs */
 							__( 'Log payment method events in %s', 'multibanco-ifthen-software-gateway-for-woocommerce' ),
-							( ( defined( 'WC_LOG_HANDLER' ) && 'WC_Log_Handler_DB' === WC_LOG_HANDLER ) || version_compare( WC_VERSION, '8.6', '>=' ) )
-							?
 							'<a href="admin.php?page=wc-status&tab=logs&source=' . esc_attr( $this->id ) . '" target="_blank">' . __( 'WooCommerce &gt; Status &gt; Logs', 'multibanco-ifthen-software-gateway-for-woocommerce' ) . '</a>'
-							:
-							'<code>' . wc_get_log_file_path( $this->id ) . '</code>'
 						),
 					),
 					'debug_email' => array(
@@ -447,6 +447,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 						</li>
 					</ul>
 					<?php
+					do_action( 'creditcard_ifthen_after_settings_intro' );
 					if ( strlen( trim( $this->creditcardkey ) ) !== 10 ) {
 						if ( intval( $this->settings_saved ) === 1 ) {
 							?>
@@ -865,8 +866,13 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 						add_filter( 'woocommerce_email_enabled_customer_processing_order', '__return_false' );
 						add_filter( 'woocommerce_email_enabled_full_payment', '__return_false' );
 					}
-					// Mark pending
-					WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', __( 'Credit or debit card', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					if ( ! $this->order_initial_status_pending ) {
+						// Mark as on-hold
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'on-hold', __( 'Credit or debit card', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					} else {
+						// Mark pending
+						WC_IfthenPay_Webdados()->set_initial_order_status( $order, 'pending', __( 'Credit or debit card', 'multibanco-ifthen-software-gateway-for-woocommerce' ) );
+					}
 				} else {
 					throw new Exception(
 						sprintf(
@@ -993,7 +999,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 							$order_details = WC_IfthenPay_Webdados()->get_creditcard_order_details( $order->get_id() );
 							$sk            = isset( $_GET['sk'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['sk'] ) ) ) : '';
 							$hash          = hash_hmac( 'sha256', $id . $val . $request_id, $order_details['creditcardkey'] );
-							if ( $sk === $hash ) {
+							if ( hash_equals( $hash, $sk ) ) {
 								$this->debug_log_extra( 'Order found: ' . $order->get_id() . ' - Hash ok' );
 								$note = sprintf(
 									/* translators: %s: payment method */
@@ -1144,7 +1150,7 @@ if ( ! class_exists( 'WC_CreditCard_IfThen_Webdados' ) ) {
 				$request_id      = trim( sanitize_text_field( wp_unslash( $_GET['request_id'] ) ) );
 				$arguments_ok    = true;
 				$arguments_error = '';
-				if ( trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) !== trim( $this->secret_key ) ) {
+				if ( ! hash_equals( trim( $this->secret_key ), trim( sanitize_text_field( wp_unslash( $_GET['key'] ) ) ) ) ) {
 					$arguments_ok     = false;
 					$arguments_error .= ' - Anti-phishing key';
 				}
