@@ -2,9 +2,9 @@
 Contributors: nakedcatplugins, webdados, ifthenpay
 Tags: ifthenpay, ecommerce, portugal, atm, homebanking
 Requires at least: 6.4
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 12.0.0
+Stable tag: 12.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -34,6 +34,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 * Allows the customer to pay in up to 12 interest-free installments via Cofidis Pay;
 * Customers with Brazilian bank accounts can use PIX;
 * Multibanco references with expiration date if the “MB Key” configuration method is used;
+* Shop owner can request an MB WAY payment again, or issue a new Multibanco reference, directly from the order edit screen once the original one has expired;
 * Automatically changes the order status to “Processing” (or “Completed” if the order only contains virtual downloadable products) and notifies both the customer and the store owner if the automatic “Callback” upon payment is activated;
 * Automatic “Callback” can be activated upon request to ifthenpay, via the plugin settings screen for each payment method;
 * Refunds for MB WAY and Credit or debit card - [read this](https://helpdesk.ifthenpay.com/pt-PT/support/solutions/articles/79000130517-devoluc%C3%B5es-de-pagamentos-aos-ordenantes);
@@ -57,6 +58,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 
 Get the [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit-card-payshop-ifthenpay-woocommerce-pro-add-on/) and unlock extra features:
 
+* For logged-in returning customers, automatically pre-select whichever of our payment methods they used on their last order at checkout, instead of the default gateway order;
 * Recover unpaid MB WAY orders (even if already automatically cancelled by WooCommerce) by converting them to Multibanco and notifying the customer via email;
 * Recover unpaid Credit card orders (even if already automatically cancelled by WooCommerce) by emailing the customer a new payment link;
 * Set MB WAY, Cofidis Pay, Credit card, and ifthenpay Gateway orders as “On hold” instead of “Pending payment” right after checkout;
@@ -258,10 +260,19 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 
 == Changelog ==
 
+= 12.1.0 - 2026-08-03 =
+* [NEW] "Issue new Multibanco reference" button on the order edit screen, once the current reference has expired, so the shop owner can request payment again without waiting for the customer to revisit the pay page
+* [NEW] Redirect to the payment gateways settings page after single-plugin activation
+* [DEV] New `ifthen_disable_disable_only_above_or_below`, `ifthen_disable_disable_unless_portugal`, and `ifthen_disable_disable_if_currency_not_euro` to disable these tests on edge case interactions with other plugins, like “Event Booking Manager for WooCommerce” in which the cart has total of zero when processing the checkout
+* [DEV] Use `WC()->cart->get_total( 'edit' )` instead of `WC()->cart->total` to get cart current total value
+* [DEV] Fix PHPCS config: minimum_supported_wp_version now matches the actual Requires at least (6.4), re-enable PHPCompatibilityWP with testVersion 7.4-
+* [DEV] Add a delete-release GitHub Actions workflow
+* [DEV] Tested up to WordPress 7.1-beta4-62968 and WooCommerce 11.0.0-rc.3
+
 = 12.0.0 - 2026-07-15 =
 * [TWEAK] Gateway keys should now be of type “WooCommerce” and not “Estáticas” (your current gateway key will still work, tho)
 * [TWEAK] Do not hide the ifthenpay order metabox even if the payment method is not one of ours
-* [FIX] Several improvements to all WooCommerce Blocks payment methods, including translations support
+* [FIX] Several improvements to all WooCommerce Blocks payment methods, including translation support
 * [FIX] Multibanco reference “no repeat days” check computed its date threshold in a way that could be off by one day right at the site's midnight boundary, due to a UTC/local offset mismatch
 * [FIX] Set API URL on Credit Card and Gateway ifthenpay earlier to avoid edge case issues when they're instantiated more than once
 * [DEV] Use `hash_equals()` instead of `!==`/`===` when comparing the anti-phishing key and the Credit card HMAC signature on all 6 gateway callback/return handlers, for constant-time comparison (defense in depth)
@@ -269,9 +280,9 @@ Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/mult
 * [DEV] Add query support for filtering orders by `_{creditcard_id}_time` (order query meta translation), matching the existing `_exp` support for other gateways
 * [DEV] Add `creditcard_ifthen_after_settings_intro` hook to the Credit card settings screen, matching Multibanco and MB WAY, so that the new Credit Card orders recovery new settings work properly
 * [DEV] Add `creditcard_ifthen_order_initial_status_pending` and `gateway_ifthen_order_initial_status_pending` filters, matching the existing MB WAY and Cofidis Pay filters, to set orders as “on-hold” instead of “pending” right from checkout
-* [DEV] Improve ifthenpay Gateway error handling when requesting for a new payment
+* [DEV] Improve ifthenpay Gateway error handling when requesting a new payment
 * [DEV] Add Playwright end-to-end test suite for WooCommerce Blocks checkout
-* [DEV] Remove WooCommerce &lt; 8.6 check for the logging settings description
+* [DEV] Remove WooCommerce lower than 8.6 check for the logging settings description
 * [DEV] Bump the “coming soon” version thresholds in the old technology admin notice to PHP 8.0, WordPress 6.7, and WooCommerce 9.6, now that the previous thresholds are already below the plugin's actual requirements
 * [DEV] Requires PHP 7.4, WordPress 6.4, and WooCommerce 9.0
 * [DEV] Tested up to WordPress 7.1-alpha-62745 and WooCommerce 10.9.4

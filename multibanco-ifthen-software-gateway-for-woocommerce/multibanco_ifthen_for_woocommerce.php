@@ -3,15 +3,15 @@
  * Plugin Name:          Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce
  * Plugin URI:           https://www.webdados.pt/wordpress/plugins/multibanco-ifthen-software-gateway-woocommerce-wordpress/
  * Description:          Secure WooCommerce payments with Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis, and PIX via ifthenpay’s payment gateway.
- * Version:              12.0.0
+ * Version:              12.1.0
  * Author:               Naked Cat Plugins (by Webdados)
  * Author URI:           https://nakedcatplugins.com
  * Text Domain:          multibanco-ifthen-software-gateway-for-woocommerce
  * Requires at least:    6.4
- * Tested up to:         7.0
+ * Tested up to:         7.1
  * Requires PHP:         7.4
  * WC requires at least: 9.0
- * WC tested up to:      10.9
+ * WC tested up to:      11.0
  * Requires Plugins:     woocommerce
  * License:              GPLv3
  **/
@@ -101,6 +101,40 @@ function mbifthen_woocommerce_not_active_admin_notices() {
 	</div>
 	<?php
 }
+
+/**
+ * Plugin activation function.
+ *
+ * @return void
+ */
+function mbifthen_activation() {
+	set_transient( 'mbifthen_activation_redirect_' . get_current_user_id(), true, 30 );
+}
+register_activation_hook( WC_IFTHENPAY_WEBDADOS_PLUGIN_FILE, 'mbifthen_activation' );
+
+/**
+ * Redirect to the payment gateways settings page after single (non-bulk) activation.
+ *
+ * @return void
+ */
+add_action(
+	'admin_init',
+	function () {
+		// Do not redirect during AJAX requests.
+		if ( wp_doing_ajax() ) {
+			return;
+		}
+		$transient_key = 'mbifthen_activation_redirect_' . get_current_user_id();
+		if ( get_transient( $transient_key ) ) {
+			delete_transient( $transient_key );
+			// Do not redirect on bulk activation.
+			if ( ! isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				wp_safe_redirect( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) );
+				exit;
+			}
+		}
+	}
+);
 
 /* HPOS & Blocks Compatible */
 add_action(
