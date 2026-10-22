@@ -1,14 +1,14 @@
-=== Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis Pay, and PIX (ifthenpay) for WooCommerce ===
+=== Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, and PIX (ifthenpay) for WooCommerce ===
 Contributors: nakedcatplugins, webdados, ifthenpay
 Tags: ifthenpay, ecommerce, portugal, atm, homebanking
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 12.1.1
+Stable tag: 12.2.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Secure WooCommerce payments with Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, Cofidis, and PIX via ifthenpay’s payment gateway.
+Secure WooCommerce payments with Multibanco, MB WAY, Credit card, Apple Pay, Google Pay, Payshop, and PIX via ifthenpay’s payment gateway.
 
 == Description ==
 
@@ -17,7 +17,7 @@ Portuguese consumers trust the “Multibanco” and “MB WAY” payment methods
 
 This plugin generates a “Multibanco” Payment Reference that customers can use to pay for their WooCommerce orders at an ATM or via home banking, or an “MB WAY” payment request which will send a push notification to the customer’s mobile phone for payment approval.
 
-Credit or debit cards, including Apple Pay and Google Pay, CTT Payshop, and Cofidis Pay payment methods are also available.
+Credit or debit cards, including Apple Pay and Google Pay, and CTT Payshop payment methods are also available.
 
 Holders of a Brazilian bank account can conveniently pay for WooCommerce orders in Euros, with automatic currency conversion to Brazilian Real, using PIX.
 
@@ -31,7 +31,6 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 * Allows the customer to pay using MB WAY using their mobile phone;
 * Allows the customer to pay using their Credit or debit card, including Apple Pay and Google Pay;
 * Generates a Payshop Reference for simple payment on the [Payshop agents network](https://www.payshop.pt/fepsapl/app/open/showSearchAgent.jspx), CTT stores or post offices available all over Portugal;
-* Allows the customer to pay in up to 12 interest-free installments via Cofidis Pay;
 * Customers with Brazilian bank accounts can use PIX;
 * Multibanco references with expiration date if the “MB Key” configuration method is used;
 * Shop owner can request an MB WAY payment again, or issue a new Multibanco reference, directly from the order edit screen once the original one has expired;
@@ -46,7 +45,7 @@ This is the official [ifthenpay](https://ifthenpay.com) plugin, and a contract w
 * WPML compatible (for multilingual shops);
 * Polylang tested;
 * [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) integration (only Multibanco);
-* [WooCommerce Deposits by webtomizer](https://woocommerce-deposits.com/) integration (except Cofidis Pay);
+* [WooCommerce Deposits by webtomizer](https://woocommerce-deposits.com/) integration;
 * Integration for 3rd party SMS notification plugins (only Multibanco and Payshop):
 	* [WooCommerce - APG SMS Notifications](https://wordpress.org/plugins/woocommerce-apg-sms-notifications/);
 	* [Twilio SMS Notifications](https://woocommerce.com/products/twilio-sms-notifications/);
@@ -61,20 +60,18 @@ Get the [PRO add-on](https://nakedcatplugins.com/product/multibanco-mbway-credit
 * For logged-in returning customers, automatically pre-select whichever of our payment methods they used on their last order at checkout, instead of the default gateway order;
 * Recover unpaid MB WAY orders (even if already automatically cancelled by WooCommerce) by converting them to Multibanco and notifying the customer via email;
 * Recover unpaid Credit card orders (even if already automatically cancelled by WooCommerce) by emailing the customer a new payment link;
-* Set MB WAY, Cofidis Pay, Credit card, and ifthenpay Gateway orders as “On hold” instead of “Pending payment” right after checkout;
+* Set MB WAY, Credit card, and ifthenpay Gateway orders as “On hold” instead of “Pending payment” right after checkout;
 * Automatic cancellation of orders when Multibanco, Payshop, or MB WAY references expire;
 * Countdown timer on the “Thank you” page for MB WAY payments;
 * Save the MB WAY mobile number to the user profile for future purchases;
 * Trigger Multibanco and MB WAY payments when creating orders via the REST API;
 * Store and show the ifthenpay fee and payout (net total) on each order;
 * Show a customizable row of ifthenpay payment method icons anywhere on your site with the “ifthenpay Payment Logos” block or shortcode;
-* Codifis payment information banner, with the price to pay monthly, on the product page (simple and variable products);
-* Set a payment entity for Multibanco, MB WAY, Credit card, Payshop, and Cofidis Pay at the product category level, so that you can receive payment in different accounts based on the order products (replaces previously available specific extension);
+* Set a payment entity for Multibanco, MB WAY, Credit card, and Payshop at the product category level, so that you can receive payment in different accounts based on the order products (replaces previously available specific extension);
 	* Simplified marketplace;
 	* Lock the cart so you can only have products from a single account in the same order;
 * Remove “ifthenpay Gateway” from the payment method title on the frontend for Apple Pay, Google Pay, and PIX
 * Remove payment instructions from specific emails, for example, “order completed”, to avoid customer confusion when they are no longer necessary;
-* Autofill the VAT number on the Cofidis Pay gateway from several VAT number plugins (more can be added on request);
 * Change the default timeout for calls to the ifthenpay APIs if your website is experiencing communication difficulties;
 * Hide notices of new available payment methods;
 * Hide notices of pending callback activation requests;
@@ -93,6 +90,8 @@ The PRO add-on is a product of [Naked Cat Plugins](https://nakedcatplugins.com) 
 
 Already know our other WooCommerce (premium) plugins?
 
+* [VAT Number and EU VIES Validation for WooCommerce](https://nakedcatplugins.com/product/vat-number-and-eu-vies-validation-for-woocommerce/?utm_source=wordpress.org&utm_medium=link&utm_campaign=mb_ifthen_plugin) - Collect and validate VAT identification numbers for the whole European Union, confirm them against VIES and remove VAT on qualifying intra-EU B2B orders
+* [EU Guarantee Notice and GARAN Label for WordPress and WooCommerce](https://nakedcatplugins.com/product/eu-guarantee-notice-and-garan-label-for-wordpress-and-woocommerce/?utm_source=wordpress.org&utm_medium=link&utm_campaign=mb_ifthen_plugin) - Show the mandatory EU guarantee notice and the EU GARAN label with the official European Commission artwork, and let Proof of Notice check every day that the notice is still on your site
 * [Portuguese Postcodes for WooCommerce](https://nakedcatplugins.com/product/portuguese-postcodes-for-woocommerce-technical-support/) - Automatic filling of the address details at the checkout, including street name and neighbourhood, based on the postal code
 * [Invoicing with InvoiceXpress for WooCommerce](https://invoicewoo.com/) - Automatically issue invoices directly from the WooCommerce order
 * [DPD Portugal for WooCommerce](https://nakedcatplugins.com/product/dpd-portugal-for-woocommerce/) - Create shipping and return guide in the DPD API directly from the WooCommerce order
@@ -111,7 +110,6 @@ Already know our other WooCommerce (premium) plugins?
 * MB WAY: Go to WooCommerce > Settings > Checkout > Pagamento MB WAY no telemóvel and fill in the data provided by ifthenpay: MB WAY Key.
 * Credit or debit card: Go to WooCommerce > Settings > Checkout > Credit or debit card and fill in the data provided by ifthenpay: Credit card Key.
 * Payshop: Go to WooCommerce > Settings > Checkout > Pagamento na rede de agentes Payshop and fill in the data provided by ifthenpay: Payshop Key.
-* Cofidis Pay: Go to WooCommerce > Settings > Checkout > Cofidis Pay and fill in the data provided by ifthenpay: Cofidis Pay Key.
 * Apple Pay, Google Pay, and PIX: Go to WooCommerce > Settings > Checkout > ifthenpay Gateway and fill in the data provided by ifthenpay: Backoffice Key, then choose the Gateway Key (request a new “Static gateway” if you don’t have one already), and finally, the Payment methods you want to activate.
 * Make sure you ask ifthenpay to activate the “Callback” on their side with the URL and Anti-phishing key provided in the settings screen. There is a feature on each payment method screen that allows you to make this request via an API, except for payment methods via the “ifthenpay Gateway” (Apple Pay, Google Pay, and PIX), where the callback activation is automatically set.
 * Start receiving payments :-)
@@ -232,7 +230,7 @@ If your permalinks are set as “Custom structure”: `/index.php/%postname%/` t
 
 This plugin does not collect or send any private data of the website where it’s installed, its customers, or the orders, to Webdados (the plugin author) or ifthenpay (the payment processor).
 In the MB WAY module, the mobile phone number is collected to request payment authorization and it can be legitimately processed based on Article 6 (1) (b) of the GDPR.
-ifthenpay’s privacy policy can be found at [https://ifthenpay.com/termosCondicoes](https://ifthenpay.com/termosCondicoes)
+ifthenpay’s privacy policy can be found at [https://ifthenpay.com/privacy-policy/?lang=en](https://ifthenpay.com/privacy-policy/?lang=en)
 
 = Is this plugin compatible with the new WooCommerce High-Performance Order Storage? =
 
@@ -259,6 +257,11 @@ You can report any security bugs found in the source code of this plugin through
 Sure. Go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/multibanco-ifthen-software-gateway-for-woocommerce) and help us out.
 
 == Changelog ==
+
+= 12.2.0 - 2026-10-22 =
+* [TWEAK] The Cofidis Pay payment method has been removed, as it is no longer available
+* [FIX] Refund confirmations sent by ifthenpay for ifthenpay Gateway payments (Apple Pay, Google Pay and others) were never recorded on the order and, on shops with many orders, made the server run out of memory and return errors until ifthenpay stopped retrying
+* [DEV] Tested up to WordPress 7.2-alpha-64319 and WooCommerce 11.2.1
 
 = 12.1.1 - 2026-08-20 =
 * [FIX] Set the MB WAY block checkout phone number max length from the selected country code, without accessing the DOM directly (which was not 100% WordPress 7.1 compatible when editing the blocks checkout page)
