@@ -316,8 +316,12 @@ final class WC_IfthenPay_Webdados {
 		add_action( 'woocommerce_cancel_unpaid_orders', array( $this, 'multibanco_woocommerce_cancel_unpaid_orders' ), 99 );
 		add_filter( 'apg_sms_message', array( $this, 'multibanco_apg_sms_message' ), 10, 2 );
 		add_filter( 'apg_sms_message', array( $this, 'payshop_apg_sms_message' ), 10, 2 );
-		add_filter( 'wcs_renewal_order_meta', array( $this, 'multibanco_wcs_filter_meta' ), 10, 3 );
-		add_filter( 'wcs_resubscribe_order_meta', array( $this, 'multibanco_wcs_filter_meta' ), 10, 3 );
+		add_filter( 'wc_subscriptions_renewal_order_data', array( $this, 'multibanco_wcs_filter_data' ) );
+		add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'multibanco_wcs_filter_data' ) );
+		if ( ! class_exists( 'WC_Subscriptions_Data_Copier' ) ) { // WooCommerce Subscriptions below 4.7
+			add_filter( 'wcs_renewal_order_meta', array( $this, 'multibanco_wcs_filter_meta' ), 10, 3 );
+			add_filter( 'wcs_resubscribe_order_meta', array( $this, 'multibanco_wcs_filter_meta' ), 10, 3 );
+		}
 		add_filter( 'wcs_renewal_order_created', array( $this, 'multibanco_wcs_renewal_order_created' ), 11, 2 );
 		add_action( 'plugins_loaded', array( $this, 'wpml_ajax_fix_locale' ) );
 		add_action( 'woocommerce_new_customer_note', array( $this, 'woocommerce_new_customer_note_fix_wpml' ), 1 );
@@ -2870,33 +2874,47 @@ final class WC_IfthenPay_Webdados {
 	}
 
 	/**
-	 * WooCommece Subscriptions - Do not copy our fields for renewal and resubscribe orders
+	 * Check if a meta key is from one of our payment methods
 	 *
-	 * @param string   $meta_query The SQL query to fetch the meta data to be copied.
+	 * @param string $meta_key The meta key.
+	 * @return bool
+	 */
+	private function is_our_meta_key( $meta_key ) {
+		foreach ( array( $this->multibanco_id, $this->mbway_id, $this->payshop_id, $this->creditcard_id, $this->gateway_ifthen_id ) as $method_id ) {
+			if ( strpos( $meta_key, '_' . $method_id ) === 0 ) { // Check if it starts with our field names
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * WooCommerce Subscriptions - Do not copy our fields for renewal and resubscribe orders
+	 *
+	 * @param array $data The data to be copied, by meta key.
+	 * @return array
+	 */
+	public function multibanco_wcs_filter_data( $data ) {
+		foreach ( array_keys( $data ) as $meta_key ) {
+			if ( $this->is_our_meta_key( (string) $meta_key ) ) {
+				unset( $data[ $meta_key ] );
+			}
+		}
+		return $data;
+	}
+
+	/**
+	 * WooCommerce Subscriptions below 4.7 - Do not copy our fields for renewal and resubscribe orders
+	 *
+	 * @param array    $meta_query The meta data to be copied, rows of meta_key and meta_value.
 	 * @param WC_Order $to_order   The object to copy data to.
 	 * @param WC_Order $from_order The object to copy data from.
+	 * @return array
 	 */
 	public function multibanco_wcs_filter_meta( $meta_query, $to_order, $from_order ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-		$mb_fields = array(
-			// Multibanco
-			'_' . $this->multibanco_id,
-			// MB WAY
-			'_' . $this->mbway_id,
-			// Payshop
-			'_' . $this->payshop_id,
-			// Credit card
-			'_' . $this->creditcard_id,
-			// ifthenpay Gateway
-			'_' . $this->gateway_ifthen_id,
-		);
 		foreach ( $meta_query as $key => $value ) {
-			if ( isset( $value['meta_key'] ) ) {
-				foreach ( $mb_fields as $field ) {
-					if ( strpos( $value['meta_key'], $field ) !== false && strpos( $value['meta_key'], $field ) === 0 ) { // Check if it starts with our field names
-						unset( $meta_query[ $key ] );
-						break;
-					}
-				}
+			if ( isset( $value['meta_key'] ) && $this->is_our_meta_key( $value['meta_key'] ) ) {
+				unset( $meta_query[ $key ] );
 			}
 		}
 		return $meta_query;
@@ -3542,6 +3560,65 @@ final class WC_IfthenPay_Webdados {
 	}
 
 	/**
+	 * Check if the payment link should be added to an email
+	 * Used by the methods paid on the ifthenpay website, which have no payment details to show
+	 *
+	 * @param WC_Order $order         The order.
+	 * @param bool     $sent_to_admin If it's sent to admin.
+	 * @param WC_Email $email         The email being sent.
+	 * @return bool
+	 */
+	public function email_needs_payment_link( $order, $sent_to_admin, $email = null ) {
+		// Only the customer pays and only orders accepted on the pay page, which is not the case of subscriptions
+		if ( $sent_to_admin || is_a( $order, 'WC_Subscription' ) || ! $order->needs_payment() ) {
+			return false;
+		}
+		// These emails already have a payment link - WooCommerce and WooCommerce Subscriptions
+		return ! ( is_object( $email ) && isset( $email->id ) && in_array( $email->id, array( 'customer_invoice', 'customer_renewal_invoice', 'customer_payment_retry' ), true ) );
+	}
+
+	/**
+	 * The payment link for emails
+	 *
+	 * @param WC_Order $order      The order.
+	 * @param string   $alt        The payment method title.
+	 * @param string   $banner     The payment method banner URL.
+	 * @param bool     $plain_text If it's plain text format.
+	 * @return string
+	 */
+	public function email_payment_link_html( $order, $alt, $banner, $plain_text = false ) {
+		$text = __( 'If you have not completed the payment yet, you can do it here:', 'multibanco-ifthen-software-gateway-for-woocommerce' );
+		$url  = $order->get_checkout_payment_url();
+		if ( $plain_text ) {
+			return "\n" . wp_strip_all_tags( $text ) . "\n" . esc_url_raw( $url ) . "\n\n";
+		}
+		ob_start();
+		?>
+		<table cellpadding="10" cellspacing="0" align="center" border="0" style="margin: auto; margin-top: 2em; margin-bottom: 2em; border-collapse: collapse; border: 1px solid #1465AA; border-radius: 4px !important; background-color: #FFFFFF;">
+			<tr>
+				<td style="border: 1px solid #1465AA; border-top-right-radius: 4px !important; border-top-left-radius: 4px !important; text-align: center; color: #000000; font-weight: bold;" colspan="2">
+					<?php esc_html_e( 'Payment instructions', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>
+					<br/>
+					<img src="<?php echo esc_url( $banner ); ?>" alt="<?php echo esc_attr( $alt ); ?>" title="<?php echo esc_attr( $alt ); ?>" style="margin-top: 10px; max-height: 48px"/>
+				</td>
+			</tr>
+			<tr>
+				<td style="border-top: 1px solid #1465AA; color: #000000;"><?php esc_html_e( 'Value', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?>:</td>
+				<td style="border-top: 1px solid #1465AA; color: #000000; white-space: nowrap; text-align: right;"><?php echo wp_kses_post( wc_price( $this->get_order_total_to_pay( $order ), array( 'currency' => $order->get_currency() ) ) ); ?></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid #1465AA; border-bottom-right-radius: 4px !important; border-bottom-left-radius: 4px !important; color: #000000; text-align: center;" colspan="2">
+					<?php echo esc_html( $text ); ?>
+					<br/>
+					<a href="<?php echo esc_url( $url ); ?>" style="font-weight: bold;"><?php esc_html_e( 'Pay for this order', 'multibanco-ifthen-software-gateway-for-woocommerce' ); ?></a>
+				</td>
+			</tr>
+		</table>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
 	 * Process MBWAY and CC refunds
 	 *
 	 * @since 7.0
@@ -3871,6 +3948,8 @@ final class WC_IfthenPay_Webdados {
 		foreach ( $wc_countries as $country_code => $country_name ) {
 			$calling_code = WC()->countries->get_country_calling_code( $country_code );
 			if ( ! empty( $calling_code ) ) {
+				// WooCommerce stores some names with HTML entities, which the block checkout shows as they are
+				$country_name                             = html_entity_decode( $country_name, ENT_QUOTES, 'UTF-8' );
 				$prefix                                   = $calling_code;
 				$countries_with_prefixes[ $country_code ] = array(
 					'name'    => $country_name,
